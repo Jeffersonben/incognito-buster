@@ -10,11 +10,14 @@ async function sha256(input) {
   return [...new Uint8Array(digest)].map((b) => b.toString(16).padStart(2, '0')).join('');
 }
 
+function getClientIp(request) {
+  const forwarded = request.headers.get('CF-Connecting-IP') || request.headers.get('x-forwarded-for') || 'unknown-ip';
+  return forwarded.split(',')[0].trim();
+}
+
 async function buildVisitorKey(request, dayStamp) {
-  const ip = request.headers.get('CF-Connecting-IP') || request.headers.get('x-forwarded-for') || 'unknown-ip';
-  const userAgent = request.headers.get('user-agent') || 'unknown-browser';
-  const acceptLanguage = request.headers.get('accept-language') || 'unknown-language';
-  const raw = ['privacy-demo-v2', ip, userAgent, acceptLanguage, dayStamp].join('|');
+  const ip = getClientIp(request);
+  const raw = ['privacy-demo-v3-ip-only', ip, dayStamp].join('|');
   return sha256(raw);
 }
 
@@ -31,7 +34,7 @@ export async function onRequestPost(context) {
       await env.PRIVACY_DEMO_KV.delete(`recognition:${dayStamp}:${visitorKey}`);
     }
 
-    return Response.json({ ok: true, message: 'Demo record deleted for this browser/network combination.' });
+    return Response.json({ ok: true, message: 'Demo record deleted for this network/day recognition key.' });
   } catch (error) {
     return Response.json({ ok: false, error: 'Could not delete demo record.' }, { status: 500 });
   }

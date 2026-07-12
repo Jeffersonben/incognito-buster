@@ -111,7 +111,7 @@ function App() {
         <div className="badge"><ShieldCheck size={16} /> Consent-based privacy demo</div>
         <h1>Incognito Reality Check</h1>
         <p className="subtitle">
-          A recruiter-friendly demo showing that private browsing clears local browser data, but a website can still use server-side memory when the user has clearly opted in.
+          A recruiter-friendly demo showing how private browsing protects local device history, while a website can still remember consented server-side data.
         </p>
         <div className="heroActions">
           <a href="#demo" className="button primary">Try the demo</a>
@@ -181,12 +181,12 @@ function App() {
       </section>
 
       <section className="card wide">
-        <div className="cardHeader"><Server /><div><h2>How the no-link version works</h2><p>No personal URL. No login. No raw IP storage.</p></div></div>
+        <div className="cardHeader"><Server /><div><h2>How the no-link version works</h2><p>Same public URL. No personal link. No raw IP storage.</p></div></div>
         <div className="steps">
           <div><b>1</b><span>User gives consent and saves a name.</span></div>
-          <div><b>2</b><span>Cloudflare Function builds a short-lived hashed key from request metadata.</span></div>
+          <div><b>2</b><span>Cloudflare Function builds a short-lived one-way hash from the network IP and current date.</span></div>
           <div><b>3</b><span>The name and safe visit details are stored in Cloudflare KV for 24 hours.</span></div>
-          <div><b>4</b><span>When the same site opens in a private tab, the server checks whether the same hashed key exists.</span></div>
+          <div><b>4</b><span>When the same public site URL opens in a private tab, the server checks whether that temporary hash exists.</span></div>
         </div>
       </section>
 
@@ -222,7 +222,7 @@ function App() {
           <div><b>Educational purpose</b><span>The UI explains the difference between local privacy and server memory.</span></div>
         </div>
         <p className="smallPrint">
-          Limitation: this recognition may fail if the user changes network, VPN, browser, language settings, or device. That limitation is part of the lesson: server-side recognition can be possible, but it is not magic.
+          Limitation: this recognition may fail if the user changes network, VPN, or public IP. On shared Wi-Fi, multiple users may share one network key. That limitation is part of the lesson: server-side recognition can be possible, but it is not magic.
         </p>
       </section>
     </main>

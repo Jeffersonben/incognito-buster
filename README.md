@@ -12,10 +12,10 @@ Instead, the flow is:
 
 1. User opens the public site URL.
 2. User reads the consent notice and saves a demo name.
-3. Cloudflare Pages Function creates a short-lived hashed recognition key from request metadata.
+3. Cloudflare Pages Function creates a short-lived one-way hash from the visitor network IP and the current date.
 4. The name is stored in Cloudflare KV for 24 hours.
 5. User opens the **same site URL** in a private/incognito tab.
-6. The server checks whether the same hashed recognition key exists.
+6. The server checks whether the same temporary hash exists.
 7. If matched, the site shows the saved name and visit details.
 
 ## Privacy design
@@ -35,9 +35,9 @@ It does:
 
 - Require user consent before saving a demo identity
 - Store a chosen display name
-- Store browser/device labels
+- Store browser/device labels for display only
 - Store timestamps
-- Use a short-lived hashed recognition key
+- Use a short-lived IP-based hash without storing the raw IP
 - Expire KV records after 24 hours
 - Provide a delete button
 
@@ -47,9 +47,6 @@ The no-link recognition method may fail if the user changes:
 
 - Network
 - VPN
-- Browser
-- Device
-- Language settings
 - ISP-provided IP address
 
 That is expected. This project demonstrates that server-side recognition can be possible, not that it is perfect.
@@ -84,4 +81,4 @@ src/styles.css                UI styles
 
 ## Recruiter-friendly explanation
 
-I intentionally avoided invasive fingerprinting and raw IP storage. The project uses a consent-based, short-lived hashed recognition key to explain the difference between local browser privacy and server-side persistence.
+I intentionally avoided invasive fingerprinting and raw IP storage. The project uses a consent-based, short-lived network hash to explain the difference between local browser privacy and server-side persistence.

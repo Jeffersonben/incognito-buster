@@ -26,11 +26,14 @@ async function sha256(input) {
   return [...new Uint8Array(digest)].map((b) => b.toString(16).padStart(2, '0')).join('');
 }
 
+function getClientIp(request) {
+  const forwarded = request.headers.get('CF-Connecting-IP') || request.headers.get('x-forwarded-for') || 'unknown-ip';
+  return forwarded.split(',')[0].trim();
+}
+
 async function buildVisitorKey(request, dayStamp) {
-  const ip = request.headers.get('CF-Connecting-IP') || request.headers.get('x-forwarded-for') || 'unknown-ip';
-  const userAgent = request.headers.get('user-agent') || 'unknown-browser';
-  const acceptLanguage = request.headers.get('accept-language') || 'unknown-language';
-  const raw = ['privacy-demo-v2', ip, userAgent, acceptLanguage, dayStamp].join('|');
+  const ip = getClientIp(request);
+  const raw = ['privacy-demo-v3-ip-only', ip, dayStamp].join('|');
   return sha256(raw);
 }
 
@@ -79,7 +82,8 @@ export async function onRequestPost(context) {
         cookiesRequired: false,
         localStorageRequired: false,
         fingerprintingUsed: false,
-        recognitionMethod: 'Short-lived hashed key from request metadata'
+        recognitionMethod: 'Short-lived one-way hash from IP address and date',
+        limitation: 'May fail if VPN, network, or public IP changes. Shared networks can share the same recognition key.'
       }
     };
 
@@ -87,7 +91,7 @@ export async function onRequestPost(context) {
 
     return Response.json({
       ok: true,
-      message: 'Demo identity saved for 24 hours.',
+      message: 'Demo identity saved for 24 hours. Open the same site URL in a private/incognito tab.',
       record: {
         name: record.name,
         browser: record.browser,
