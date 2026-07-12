@@ -1,6 +1,6 @@
 import React, { useEffect, useMemo, useState } from 'react';
 import { createRoot } from 'react-dom/client';
-import { ShieldCheck, Eye, Database, Lock, Trash2, RefreshCcw, AlertTriangle, Server, Browser, CheckCircle2 } from 'lucide-react';
+import { ShieldCheck, Eye, Database, Lock, Trash2, RefreshCcw, AlertTriangle, Server, Globe, CheckCircle2 } from 'lucide-react';
 import './styles.css';
 
 function formatDate(value) {
@@ -201,7 +201,7 @@ function App() {
           </ul>
         </div>
         <div className="card">
-          <div className="cardHeader"><Browser /><div><h2>What it does not fully hide</h2><p>The internet still has receipts. Naturally.</p></div></div>
+          <div className="cardHeader"><Globe /><div><h2>What it does not fully hide</h2><p>The internet still has receipts. Naturally.</p></div></div>
           <ul className="cleanList warn">
             <li>Server-side records created by websites</li>
             <li>Your network/IP as seen by the website</li>
