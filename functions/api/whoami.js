@@ -34,70 +34,71 @@ async function buildVisitorKey(request, dayStamp) {
   return sha256(raw);
 }
 
-export async function onRequestPost(context) {
+async function findRecord(env, request) {
+  const days = [getDayStamp(0), getDayStamp(-1)];
+  for (const dayStamp of days) {
+    const visitorKey = await buildVisitorKey(request, dayStamp);
+    const recordKey = `recognition:${dayStamp}:${visitorKey}`;
+    const value = await env.PRIVACY_DEMO_KV.get(recordKey);
+    if (value) return { recordKey, record: JSON.parse(value) };
+  }
+  return null;
+}
+
+export async function onRequestGet(context) {
   try {
     const { request, env } = context;
     if (!env.PRIVACY_DEMO_KV) {
       return Response.json({ ok: false, error: 'Missing KV binding: PRIVACY_DEMO_KV' }, { status: 500 });
     }
 
-    const body = await request.json();
-    const name = String(body.name || '').trim().slice(0, 60);
-    const consent = body.consent === true;
-
-    if (!consent) {
-      return Response.json({ ok: false, error: 'Consent is required for this educational demo.' }, { status: 400 });
-    }
-
-    if (!name) {
-      return Response.json({ ok: false, error: 'Name is required.' }, { status: 400 });
-    }
-
+    const found = await findRecord(env, request);
     const userAgent = request.headers.get('user-agent') || '';
-    const dayStamp = getDayStamp(0);
-    const visitorKey = await buildVisitorKey(request, dayStamp);
-    const recordKey = `recognition:${dayStamp}:${visitorKey}`;
+
+    if (!found) {
+      return Response.json({
+        ok: true,
+        known: false,
+        currentVisit: {
+          browser: detectBrowser(userAgent),
+          device: detectDevice(userAgent),
+          checkedAt: new Date().toISOString()
+        }
+      });
+    }
 
     const now = new Date().toISOString();
-    const record = {
-      name,
-      firstSavedAt: now,
-      lastSeenAt: now,
+    const visit = {
+      type: 'site-opened-again',
+      time: now,
       browser: detectBrowser(userAgent),
-      device: detectDevice(userAgent),
-      visits: [
-        {
-          type: 'normal-tab-save',
-          time: now,
-          browser: detectBrowser(userAgent),
-          device: detectDevice(userAgent)
-        }
-      ],
-      storageSource: 'Cloudflare KV server-side storage',
-      privacy: {
-        rawIpStored: false,
-        cookiesRequired: false,
-        localStorageRequired: false,
-        fingerprintingUsed: false,
-        recognitionMethod: 'Short-lived hashed key from request metadata'
-      }
+      device: detectDevice(userAgent)
     };
 
-    await env.PRIVACY_DEMO_KV.put(recordKey, JSON.stringify(record), { expirationTtl: 60 * 60 * 24 });
+    const updated = {
+      ...found.record,
+      lastSeenAt: now,
+      visits: [...(found.record.visits || []), visit].slice(-6)
+    };
+
+    await env.PRIVACY_DEMO_KV.put(found.recordKey, JSON.stringify(updated), { expirationTtl: 60 * 60 * 24 });
 
     return Response.json({
       ok: true,
-      message: 'Demo identity saved for 24 hours.',
+      known: true,
       record: {
-        name: record.name,
-        browser: record.browser,
-        device: record.device,
-        firstSavedAt: record.firstSavedAt,
-        storageSource: record.storageSource,
-        expiresIn: '24 hours'
+        name: updated.name,
+        firstSavedAt: updated.firstSavedAt,
+        lastSeenAt: updated.lastSeenAt,
+        browser: updated.browser,
+        device: updated.device,
+        visits: updated.visits,
+        storageSource: updated.storageSource,
+        privacy: updated.privacy,
+        expiresIn: '24 hours from latest match'
       }
     });
   } catch (error) {
-    return Response.json({ ok: false, error: 'Could not save demo identity.' }, { status: 500 });
+    return Response.json({ ok: false, error: 'Could not check demo identity.' }, { status: 500 });
   }
 }

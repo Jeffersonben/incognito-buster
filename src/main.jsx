@@ -1,343 +1,229 @@
 import React, { useEffect, useMemo, useState } from 'react';
 import { createRoot } from 'react-dom/client';
-import {
-  Shield,
-  Database,
-  Cookie,
-  MonitorSmartphone,
-  Server,
-  CheckCircle2,
-  XCircle,
-  LockKeyhole,
-  Globe2,
-  Copy,
-  ExternalLink,
-  AlertTriangle,
-  Fingerprint,
-  Trash2,
-  Eye,
-  FileText,
-  Timer,
-  UserCheck,
-  KeyRound
-} from 'lucide-react';
+import { ShieldCheck, Eye, Database, Lock, Trash2, RefreshCcw, AlertTriangle, Server, Browser, CheckCircle2 } from 'lucide-react';
 import './styles.css';
 
-const quizQuestions = [
-  { id: 'history', label: 'Browsing history on the same device', answer: true },
-  { id: 'cookies', label: 'Private-window cookies after closing the private window', answer: true },
-  { id: 'server', label: 'Information saved on a website server', answer: false },
-  { id: 'ip', label: 'Your IP address from websites', answer: false },
-  { id: 'login', label: 'Your identity after logging into the same account', answer: false }
-];
-
-const recognitionMethods = [
-  {
-    title: 'Consent demo ID',
-    status: 'Used here',
-    safe: true,
-    text: 'A random ID is placed in the private-tab test link. The server uses that ID to load the saved record. It is transparent and reliable.'
-  },
-  {
-    title: 'User login',
-    status: 'Common',
-    safe: true,
-    text: 'If a user logs into the same account in private mode, the website knows them because they identified themselves.'
-  },
-  {
-    title: 'IP and device clues',
-    status: 'Explained only',
-    safe: false,
-    text: 'Some services may compare network and browser clues. This can be privacy-sensitive, so this project does not use it.'
-  },
-  {
-    title: 'Browser fingerprinting',
-    status: 'Not used',
-    safe: false,
-    text: 'Fingerprinting combines many browser signals. It is intentionally avoided here because this is an educational project, not a tracking machine.'
+function formatDate(value) {
+  if (!value) return 'Not available';
+  try {
+    return new Intl.DateTimeFormat(undefined, {
+      dateStyle: 'medium',
+      timeStyle: 'short'
+    }).format(new Date(value));
+  } catch {
+    return value;
   }
-];
-
-function getIdFromUrl() {
-  return new URLSearchParams(window.location.search).get('demo');
-}
-
-function Card({ children, className = '' }) {
-  return <section className={`card ${className}`}>{children}</section>;
-}
-
-function Pill({ children, type = 'neutral' }) {
-  return <span className={`pill ${type}`}>{children}</span>;
-}
-
-function PrivacyBar({ label, value }) {
-  return (
-    <div className="bar-row">
-      <div className="bar-label"><span>{label}</span><strong>{value}%</strong></div>
-      <div className="bar-track"><div className="bar-fill" style={{ width: `${value}%` }} /></div>
-    </div>
-  );
 }
 
 function App() {
-  const demoId = useMemo(getIdFromUrl, []);
   const [name, setName] = useState('');
   const [consent, setConsent] = useState(false);
-  const [saved, setSaved] = useState(null);
-  const [lookup, setLookup] = useState(null);
-  const [loading, setLoading] = useState(false);
-  const [copied, setCopied] = useState(false);
-  const [quiz, setQuiz] = useState({});
-  const [quizDone, setQuizDone] = useState(false);
-  const [deleted, setDeleted] = useState(false);
-  const [clientStorage, setClientStorage] = useState({ cookies: false, localStorage: false, sessionStorage: false });
+  const [status, setStatus] = useState('checking');
+  const [message, setMessage] = useState('Checking server-side memory...');
+  const [record, setRecord] = useState(null);
+  const [currentVisit, setCurrentVisit] = useState(null);
+  const [saving, setSaving] = useState(false);
+  const [deleting, setDeleting] = useState(false);
+
+  const storageSnapshot = useMemo(() => {
+    let localItems = 0;
+    let sessionItems = 0;
+    try { localItems = window.localStorage.length; } catch {}
+    try { sessionItems = window.sessionStorage.length; } catch {}
+    return {
+      cookies: document.cookie ? 'Has cookies' : 'No visible cookies',
+      localStorage: localItems === 0 ? 'Empty or unavailable' : `${localItems} item(s)` ,
+      sessionStorage: sessionItems === 0 ? 'Empty or unavailable' : `${sessionItems} item(s)`
+    };
+  }, [status]);
+
+  async function checkIdentity() {
+    setStatus('checking');
+    setMessage('Checking server-side memory...');
+    try {
+      const res = await fetch('/api/whoami', { cache: 'no-store' });
+      const data = await res.json();
+      if (!data.ok) throw new Error(data.error || 'Check failed');
+      if (data.known) {
+        setRecord(data.record);
+        setCurrentVisit(null);
+        setStatus('known');
+        setMessage(`Welcome back, ${data.record.name}.`);
+      } else {
+        setRecord(null);
+        setCurrentVisit(data.currentVisit);
+        setStatus('unknown');
+        setMessage('No matching server-side demo record found for this visit.');
+      }
+    } catch (error) {
+      setStatus('error');
+      setMessage(error.message || 'Could not check identity.');
+    }
+  }
 
   useEffect(() => {
-    const hasCookie = document.cookie.includes('normal_demo_cookie');
-    const hasLocal = Boolean(localStorage.getItem('normal_demo_name'));
-    const hasSession = Boolean(sessionStorage.getItem('normal_demo_session'));
-    setClientStorage({ cookies: hasCookie, localStorage: hasLocal, sessionStorage: hasSession });
+    checkIdentity();
   }, []);
 
-  useEffect(() => {
-    if (!demoId) return;
-    const run = async () => {
-      setLoading(true);
-      try {
-        const res = await fetch(`/api/get-demo?id=${encodeURIComponent(demoId)}`);
-        setLookup(await res.json());
-      } catch (err) {
-        setLookup({ ok: false, error: 'Could not contact the server.' });
-      } finally {
-        setLoading(false);
-      }
-    };
-    run();
-  }, [demoId]);
-
-  async function saveDemo(e) {
-    e.preventDefault();
-    if (!name.trim() || !consent) return;
-    setLoading(true);
+  async function saveDemo(event) {
+    event.preventDefault();
+    setSaving(true);
+    setMessage('Saving demo identity on the server...');
     try {
-      document.cookie = 'normal_demo_cookie=created_in_normal_tab; SameSite=Lax; max-age=3600';
-      localStorage.setItem('normal_demo_name', name.trim());
-      sessionStorage.setItem('normal_demo_session', 'normal tab only');
       const res = await fetch('/api/save-demo', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ name: name.trim(), consent })
+        body: JSON.stringify({ name, consent })
       });
       const data = await res.json();
-      setSaved(data);
-      setClientStorage({ cookies: true, localStorage: true, sessionStorage: true });
-    } catch (err) {
-      setSaved({ ok: false, error: 'Save failed. Check your Cloudflare KV binding.' });
+      if (!data.ok) throw new Error(data.error || 'Save failed');
+      setMessage('Saved. Now open the same site URL in a private/incognito tab. No personal link needed.');
+      await checkIdentity();
+    } catch (error) {
+      setStatus('error');
+      setMessage(error.message || 'Could not save demo identity.');
     } finally {
-      setLoading(false);
+      setSaving(false);
     }
-  }
-
-  const activeId = demoId || saved?.id;
-  const demoUrl = saved?.id ? `${window.location.origin}${window.location.pathname}?demo=${saved.id}` : '';
-  const score = quizQuestions.filter(q => Boolean(quiz[q.id]) === q.answer).length;
-
-  async function copyLink() {
-    await navigator.clipboard.writeText(demoUrl);
-    setCopied(true);
-    setTimeout(() => setCopied(false), 1600);
   }
 
   async function deleteDemo() {
-    if (!activeId) return;
-    setLoading(true);
+    setDeleting(true);
+    setMessage('Deleting this demo record...');
     try {
-      await fetch('/api/delete-demo', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ id: activeId })
-      });
-      setDeleted(true);
-      setLookup(null);
-      setSaved(null);
+      const res = await fetch('/api/delete-demo', { method: 'POST' });
+      const data = await res.json();
+      if (!data.ok) throw new Error(data.error || 'Delete failed');
+      setRecord(null);
+      setStatus('unknown');
+      setMessage('Deleted. Refresh or open a private tab to confirm the server no longer recognizes this visit.');
+    } catch (error) {
+      setStatus('error');
+      setMessage(error.message || 'Could not delete demo record.');
     } finally {
-      setLoading(false);
+      setDeleting(false);
     }
   }
 
-  const record = lookup?.record;
-
   return (
-    <main>
+    <main className="page">
       <section className="hero">
-        <div className="hero-copy">
-          <Pill type="glow"><Shield size={16} /> Consent-first privacy demo</Pill>
-          <h1>Private browsing is not a magic invisibility cloak.</h1>
-          <p>
-            This Cloudflare Pages project shows how a website can remember server-side data even when the user opens a private window. It uses a safe demo ID, not fingerprinting, because recruiters enjoy ethics almost as much as clean code.
-          </p>
-          <div className="hero-actions">
-            <a href="#demo" className="button primary">Try safe demo</a>
-            <a href="#recognition" className="button secondary">Recognition methods</a>
+        <div className="badge"><ShieldCheck size={16} /> Consent-based privacy demo</div>
+        <h1>Incognito Reality Check</h1>
+        <p className="subtitle">
+          A recruiter-friendly demo showing that private browsing clears local browser data, but a website can still use server-side memory when the user has clearly opted in.
+        </p>
+        <div className="heroActions">
+          <a href="#demo" className="button primary">Try the demo</a>
+          <a href="#privacy" className="button secondary">Read privacy design</a>
+        </div>
+      </section>
+
+      <section className="grid" id="demo">
+        <div className="card mainCard">
+          <div className="cardHeader">
+            <Eye />
+            <div>
+              <h2>Live recognition status</h2>
+              <p>{message}</p>
+            </div>
           </div>
-        </div>
-        <div className="terminal-card">
-          <div className="terminal-header"><span></span><span></span><span></span></div>
-          <code>
-            Step 1: user gives consent<br />
-            Step 2: server stores chosen name<br />
-            Step 3: private tab opens demo ID link<br />
-            Step 4: server returns saved record<br />
-            <strong>No raw IP. No fingerprinting. No nonsense.</strong>
-          </code>
-        </div>
-      </section>
 
-      <section className="notice">
-        <FileText />
-        <div>
-          <strong>Educational privacy notice</strong>
-          <p>This demo temporarily stores your chosen display name, browser type, device type, timestamp, and a random demo ID. It does not collect passwords, raw IP addresses, precise location, browsing history, or cross-site tracking data. Demo records expire after 24 hours.</p>
-        </div>
-      </section>
+          <div className={`statusBox ${status}`}>
+            {status === 'known' ? <CheckCircle2 /> : status === 'error' ? <AlertTriangle /> : <RefreshCcw />}
+            <span>{status === 'known' ? 'Server-side record found' : status === 'checking' ? 'Checking...' : status === 'error' ? 'Something needs fixing' : 'No record found yet'}</span>
+          </div>
 
-      <section id="demo" className="grid two">
-        <Card>
-          <h2>{demoId ? 'Private-window result' : 'Create a demo identity'}</h2>
-          {!demoId ? (
-            <>
-              <p className="muted">Type a name, consent to the educational demo, then open the generated link in a private browser window.</p>
-              <form onSubmit={saveDemo} className="form">
-                <label>Your demo name</label>
-                <input value={name} onChange={e => setName(e.target.value)} placeholder="Example: Paul" />
-                <label className="consent-box">
-                  <input type="checkbox" checked={consent} onChange={e => setConsent(e.target.checked)} />
-                  <span>I understand this site will temporarily save my chosen name and basic browser/device details for this educational demo.</span>
-                </label>
-                <button className="button primary" disabled={loading || !name.trim() || !consent}>{loading ? 'Saving...' : 'Create private-tab test link'}</button>
-              </form>
-              {saved?.ok && (
-                <div className="result-box success">
-                  <CheckCircle2 />
-                  <div>
-                    <strong>Demo identity saved on the server.</strong>
-                    <p>Open this link in a private/incognito window:</p>
-                    <div className="link-row"><input readOnly value={demoUrl} /><button onClick={copyLink}><Copy size={16} /> {copied ? 'Copied' : 'Copy'}</button></div>
-                    <a className="button secondary full" href={demoUrl} target="_blank" rel="noreferrer"><ExternalLink size={16} /> Open test link</a>
-                  </div>
-                </div>
-              )}
-              {saved?.ok === false && <div className="result-box danger"><AlertTriangle />{saved.error}</div>}
-            </>
+          {record ? (
+            <div className="resultPanel">
+              <h3>Welcome back, {record.name}</h3>
+              <p>This name came from Cloudflare KV server storage, not from cookies, localStorage, or sessionStorage.</p>
+              <div className="facts">
+                <span>Browser: <b>{record.browser}</b></span>
+                <span>Device: <b>{record.device}</b></span>
+                <span>Saved: <b>{formatDate(record.firstSavedAt)}</b></span>
+                <span>Last seen: <b>{formatDate(record.lastSeenAt)}</b></span>
+                <span>Expires: <b>{record.expiresIn}</b></span>
+              </div>
+              <button className="button danger" onClick={deleteDemo} disabled={deleting}>
+                <Trash2 size={16} /> {deleting ? 'Deleting...' : 'Delete my demo record'}
+              </button>
+            </div>
           ) : (
-            <>
-              {loading && <p>Checking server record...</p>}
-              {record && !deleted && (
-                <div className="reveal">
-                  <Eye size={42} />
-                  <h3>Welcome back, {record.name}.</h3>
-                  <p>This came from Cloudflare KV server storage using the demo ID in the URL. Your private window did not need normal-tab cookies or local storage.</p>
-                  <div className="meta-grid">
-                    <div><span>Storage source</span><strong>{record.storageSource}</strong></div>
-                    <div><span>Consent mode</span><strong>{record.consentMode}</strong></div>
-                    <div><span>Browser clue</span><strong>{record.browser}</strong></div>
-                    <div><span>Device clue</span><strong>{record.device}</strong></div>
-                    <div><span>Created</span><strong>{new Date(record.createdAt).toLocaleString()}</strong></div>
-                    <div><span>Times opened</span><strong>{record.openCount}</strong></div>
-                  </div>
-                </div>
-              )}
-              {lookup?.ok === false && <div className="result-box danger"><AlertTriangle /> {lookup.error}</div>}
-            </>
-          )}
-          {activeId && !deleted && <button className="button danger-btn full" onClick={deleteDemo} disabled={loading}><Trash2 size={16} /> Delete my demo record</button>}
-          {deleted && <div className="result-box success"><CheckCircle2 /> Demo record deleted.</div>}
-        </Card>
-
-        <Card>
-          <h2>Logged details</h2>
-          <p className="muted">Show recruiters exactly what is stored. Transparent logs, not mysterious internet wizardry.</p>
-          <div className="log-list">
-            {(record?.visitLog || []).map((item, index) => (
-              <div className="log-item" key={`${item.at}-${index}`}>
-                <Timer />
-                <div><strong>{item.event}</strong><p>{new Date(item.at).toLocaleString()} • {item.browser} • {item.device}</p></div>
-              </div>
-            ))}
-            {!record && <p className="empty-state">Create or open a demo link to see visit logs here.</p>}
-          </div>
-        </Card>
-      </section>
-
-      <section className="grid two">
-        <Card>
-          <h2>Storage inspector</h2>
-          <div className="storage-list">
-            <div className="storage-item"><Cookie /><div><strong>Cookies</strong><p>Private windows use a separate temporary cookie jar.</p></div>{clientStorage.cookies ? <Pill type="yes">Normal tab has data</Pill> : <Pill type="no">Not found</Pill>}</div>
-            <div className="storage-item"><MonitorSmartphone /><div><strong>Local Storage</strong><p>Normal-tab local storage is not the proof here.</p></div>{clientStorage.localStorage ? <Pill type="yes">Normal tab has data</Pill> : <Pill type="no">Not found</Pill>}</div>
-            <div className="storage-item"><LockKeyhole /><div><strong>Session Storage</strong><p>Session storage is tied to the tab session.</p></div>{clientStorage.sessionStorage ? <Pill type="yes">Normal tab has data</Pill> : <Pill type="no">Not found</Pill>}</div>
-            <div className="storage-item"><Database /><div><strong>Server Database</strong><p>Cloudflare KV can return data to a private window if it has the demo ID.</p></div>{record || saved?.ok ? <Pill type="yes">Server data found</Pill> : <Pill type="no">No demo record</Pill>}</div>
-          </div>
-        </Card>
-
-        <Card id="recognition">
-          <h2>How websites can recognize returning visitors</h2>
-          <p className="muted">This section explains the concept safely. Only the consent demo ID is used in this app.</p>
-          <div className="method-grid">
-            {recognitionMethods.map(method => (
-              <div className="method" key={method.title}>
-                <div className="method-head"><Fingerprint /><strong>{method.title}</strong><Pill type={method.safe ? 'yes' : 'warn'}>{method.status}</Pill></div>
-                <p>{method.text}</p>
-              </div>
-            ))}
-          </div>
-        </Card>
-      </section>
-
-      <section className="grid two">
-        <Card>
-          <h2>Privacy meter</h2>
-          <PrivacyBar label="Local browsing history protection" value={100} />
-          <PrivacyBar label="Temporary private-window cookie cleanup" value={100} />
-          <PrivacyBar label="Protection from server-side records" value={0} />
-          <PrivacyBar label="Protection after logging into same account" value={0} />
-        </Card>
-
-        <Card>
-          <h2>Quick knowledge check</h2>
-          <p className="muted">Select what private browsing usually protects.</p>
-          <div className="quiz-list">
-            {quizQuestions.map(q => (
-              <label key={q.id} className="quiz-item">
-                <input type="checkbox" checked={Boolean(quiz[q.id])} onChange={e => setQuiz({ ...quiz, [q.id]: e.target.checked })} />
-                <span>{q.label}</span>
+            <form onSubmit={saveDemo} className="form">
+              <label>
+                Your demo name
+                <input value={name} onChange={(e) => setName(e.target.value)} placeholder="Example: Paul" maxLength={60} />
               </label>
-            ))}
+              <label className="check">
+                <input type="checkbox" checked={consent} onChange={(e) => setConsent(e.target.checked)} />
+                <span>I understand this educational demo will temporarily store my chosen name and a hashed recognition key for 24 hours.</span>
+              </label>
+              <button className="button primary" disabled={saving || !name.trim() || !consent}>
+                {saving ? 'Saving...' : 'Save demo identity'}
+              </button>
+              {currentVisit && (
+                <p className="hint">Current visit: {currentVisit.browser}, {currentVisit.device}</p>
+              )}
+            </form>
+          )}
+        </div>
+
+        <div className="card">
+          <div className="cardHeader"><Database /><div><h2>Storage inspector</h2><p>What this browser currently exposes.</p></div></div>
+          <div className="storageList">
+            <div><span>Cookies</span><b>{storageSnapshot.cookies}</b></div>
+            <div><span>Local Storage</span><b>{storageSnapshot.localStorage}</b></div>
+            <div><span>Session Storage</span><b>{storageSnapshot.sessionStorage}</b></div>
+            <div><span>Server KV</span><b>{record ? 'Record found' : 'No match yet'}</b></div>
           </div>
-          <button className="button primary" onClick={() => setQuizDone(true)}>Check answer</button>
-          {quizDone && <div className="score"><strong>{score} / {quizQuestions.length}</strong><p>Private browsing is mainly local-device privacy. It is not an internet disguise kit, sadly.</p></div>}
-        </Card>
+        </div>
       </section>
 
-      <section className="grid two">
-        <Card>
-          <h2>Architecture</h2>
-          <div className="flow">
-            <div><UserCheck /> Consent + name</div><span>↓</span>
-            <div><Server /> Cloudflare Pages Function</div><span>↓</span>
-            <div><Database /> Cloudflare KV, expires in 24h</div><span>↓</span>
-            <div><KeyRound /> Random demo ID link</div><span>↓</span>
-            <div><Globe2 /> Private window loads same server record</div>
-          </div>
-        </Card>
+      <section className="card wide">
+        <div className="cardHeader"><Server /><div><h2>How the no-link version works</h2><p>No personal URL. No login. No raw IP storage.</p></div></div>
+        <div className="steps">
+          <div><b>1</b><span>User gives consent and saves a name.</span></div>
+          <div><b>2</b><span>Cloudflare Function builds a short-lived hashed key from request metadata.</span></div>
+          <div><b>3</b><span>The name and safe visit details are stored in Cloudflare KV for 24 hours.</span></div>
+          <div><b>4</b><span>When the same site opens in a private tab, the server checks whether the same hashed key exists.</span></div>
+        </div>
+      </section>
 
-        <Card>
-          <h2>Recruiter-friendly takeaway</h2>
-          <div className="takeaway"><CheckCircle2 /><p><strong>Technical concept:</strong> private mode limits local browser traces, but server-side persistence still works.</p></div>
-          <div className="takeaway"><Shield /><p><strong>Ethical choice:</strong> this project avoids raw IP storage, fingerprinting, precise location, and silent tracking.</p></div>
-          <div className="takeaway warning"><XCircle /><p><strong>What it does not claim:</strong> it does not hack or bypass private browsing. It explains its limits.</p></div>
-          <p className="linkedin-copy">LinkedIn caption: “I redesigned my Incognito Myth Buster project using consent-based server memory. It explains how private browsing protects local history, while server-side records can still exist.”</p>
-        </Card>
+      <section className="grid">
+        <div className="card">
+          <div className="cardHeader"><Lock /><div><h2>What private browsing protects</h2><p>Mostly local traces on the device.</p></div></div>
+          <ul className="cleanList good">
+            <li>Browsing history on this device</li>
+            <li>Most cookies after the private session closes</li>
+            <li>Local storage created inside that private session</li>
+            <li>Form history and cached traces</li>
+          </ul>
+        </div>
+        <div className="card">
+          <div className="cardHeader"><Browser /><div><h2>What it does not fully hide</h2><p>The internet still has receipts. Naturally.</p></div></div>
+          <ul className="cleanList warn">
+            <li>Server-side records created by websites</li>
+            <li>Your network/IP as seen by the website</li>
+            <li>Browser and device information sent in requests</li>
+            <li>Activity from accounts you log into</li>
+          </ul>
+        </div>
+      </section>
+
+      <section className="card wide" id="privacy">
+        <div className="cardHeader"><ShieldCheck /><div><h2>Privacy design</h2><p>Built to explain the concept, not stalk anyone like a bargain-bin ad network.</p></div></div>
+        <div className="privacyGrid">
+          <div><b>No raw IP stored</b><span>The server uses a one-way hash for recognition.</span></div>
+          <div><b>Consent required</b><span>The user must actively agree before data is saved.</span></div>
+          <div><b>24-hour expiry</b><span>Records automatically expire from Cloudflare KV.</span></div>
+          <div><b>No fingerprinting</b><span>The demo avoids canvas, font, audio, GPU, and hidden fingerprinting.</span></div>
+          <div><b>Delete button</b><span>Users can remove the demo record.</span></div>
+          <div><b>Educational purpose</b><span>The UI explains the difference between local privacy and server memory.</span></div>
+        </div>
+        <p className="smallPrint">
+          Limitation: this recognition may fail if the user changes network, VPN, browser, language settings, or device. That limitation is part of the lesson: server-side recognition can be possible, but it is not magic.
+        </p>
       </section>
     </main>
   );

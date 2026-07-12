@@ -1,88 +1,87 @@
-# Incognito Myth Buster
+# Incognito Reality Check
 
-A consent-first Cloudflare Pages project that explains what private browsing protects and what it does not protect.
+A consent-based Cloudflare Pages project that demonstrates a simple idea:
 
-## What the project demonstrates
+> Private browsing mainly protects local browser history and storage. It does not automatically erase server-side memory.
 
-This app shows that private/incognito browsing is mainly local-device privacy. It can help avoid saving browsing history, temporary cookies, and form data in the normal browser profile, but it does not erase data that a website already saved on its own server.
+## What changed in this version
 
-The demo uses a safe method:
+This version does **not** create a separate personalized link for each user.
 
-1. The user gives consent.
-2. The user enters a chosen display name.
-3. A Cloudflare Pages Function stores the record in Cloudflare KV.
-4. The app creates a random demo ID link.
-5. The user opens that link in a private window.
-6. The server returns the saved name and visit details.
+Instead, the flow is:
 
-## Safe design choices
+1. User opens the public site URL.
+2. User reads the consent notice and saves a demo name.
+3. Cloudflare Pages Function creates a short-lived hashed recognition key from request metadata.
+4. The name is stored in Cloudflare KV for 24 hours.
+5. User opens the **same site URL** in a private/incognito tab.
+6. The server checks whether the same hashed recognition key exists.
+7. If matched, the site shows the saved name and visit details.
 
-This project intentionally avoids invasive recognition methods.
+## Privacy design
 
-It does not collect:
+This project is designed for education and portfolio use.
 
-- Passwords
-- Raw IP addresses
-- Precise location
-- Browsing history
-- Cross-site tracking data
-- Browser fingerprints
+It does not:
 
-Demo records expire after 24 hours.
+- Store raw IP addresses
+- Use hidden browser fingerprinting
+- Use canvas, audio, GPU, font, or WebGL fingerprinting
+- Track users across other websites
+- Sell or share data
+- Store records permanently
 
-## Features
+It does:
 
-- Consent-first demo flow
-- Cloudflare KV server-side storage
-- Private-tab test link
-- Logged visit details
-- Storage inspector for cookies, local storage, session storage, and server storage
-- Explanation section: how websites can sometimes recognize returning visitors
-- Privacy meter
-- Quiz section
-- Delete demo record button
-- LinkedIn-friendly project explanation
+- Require user consent before saving a demo identity
+- Store a chosen display name
+- Store browser/device labels
+- Store timestamps
+- Use a short-lived hashed recognition key
+- Expire KV records after 24 hours
+- Provide a delete button
 
-## Tech stack
+## Important limitation
 
-- React
-- Vite
-- Cloudflare Pages
-- Cloudflare Pages Functions
-- Cloudflare KV
-- lucide-react icons
+The no-link recognition method may fail if the user changes:
+
+- Network
+- VPN
+- Browser
+- Device
+- Language settings
+- ISP-provided IP address
+
+That is expected. This project demonstrates that server-side recognition can be possible, not that it is perfect.
 
 ## Cloudflare setup
 
-Create a KV namespace in Cloudflare, then add a KV binding to your Pages project.
+Create a Cloudflare KV namespace and bind it to your Pages project.
 
-Binding variable name must be exactly:
+Binding name must be exactly:
 
-```text
+```txt
 PRIVACY_DEMO_KV
 ```
 
-Add the binding to both Production and Preview environments.
+Build settings:
 
-## Build settings
-
-Cloudflare Pages settings:
-
-```text
+```txt
 Framework preset: Vite
 Build command: npm run build
 Build output directory: dist
 ```
 
-## Local development
+## Project structure
 
-```bash
-npm install
-npm run dev
+```txt
+functions/api/save-demo.js    Saves the demo identity
+functions/api/whoami.js       Checks whether the server recognizes the visit
+functions/api/delete-demo.js  Deletes the demo identity
+src/main.jsx                  React app
+src/styles.css                UI styles
 ```
-
-For full Cloudflare Function + KV testing, use Cloudflare's Pages development tooling or deploy to Cloudflare Pages.
 
 ## Recruiter-friendly explanation
 
-I built this project to explain the difference between browser-side privacy and server-side persistence. I intentionally avoided browser fingerprinting and raw IP storage, using a consent-based demo token instead. This demonstrates both technical understanding and privacy-aware engineering.
+I intentionally avoided invasive fingerprinting and raw IP storage. The project uses a consent-based, short-lived hashed recognition key to explain the difference between local browser privacy and server-side persistence.
