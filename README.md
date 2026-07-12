@@ -1,84 +1,56 @@
-# Incognito Reality Check
+# Incognito Buster: Beginner-Friendly Privacy Demo
 
-A consent-based Cloudflare Pages project that demonstrates a simple idea:
+A Cloudflare Pages project that explains, in plain language, why private/incognito browsing does not make a visitor invisible to websites.
 
-> Private browsing mainly protects local browser history and storage. It does not automatically erase server-side memory.
+## What this version does
 
-## What changed in this version
+- No personalized demo link
+- User saves a name in a normal tab
+- User opens the same site URL in a private/incognito tab
+- The site checks whether the server has a temporary demo record
+- Uses a temporary hashed network key
+- Does not store raw IP addresses
+- Does not use invasive browser fingerprinting
+- Demo records expire after 24 hours
+- Includes beginner-friendly step-by-step instructions
+- Quiz section removed
 
-This version does **not** create a separate personalized link for each user.
+## What this project teaches
 
-Instead, the flow is:
-
-1. User opens the public site URL.
-2. User reads the consent notice and saves a demo name.
-3. Cloudflare Pages Function creates a short-lived one-way hash from the visitor network IP and the current date.
-4. The name is stored in Cloudflare KV for 24 hours.
-5. User opens the **same site URL** in a private/incognito tab.
-6. The server checks whether the same temporary hash exists.
-7. If matched, the site shows the saved name and visit details.
-
-## Privacy design
-
-This project is designed for education and portfolio use.
-
-It does not:
-
-- Store raw IP addresses
-- Use hidden browser fingerprinting
-- Use canvas, audio, GPU, font, or WebGL fingerprinting
-- Track users across other websites
-- Sell or share data
-- Store records permanently
-
-It does:
-
-- Require user consent before saving a demo identity
-- Store a chosen display name
-- Store browser/device labels for display only
-- Store timestamps
-- Use a short-lived IP-based hash without storing the raw IP
-- Expire KV records after 24 hours
-- Provide a delete button
-
-## Important limitation
-
-The no-link recognition method may fail if the user changes:
-
-- Network
-- VPN
-- ISP-provided IP address
-
-That is expected. This project demonstrates that server-side recognition can be possible, not that it is perfect.
+Private browsing mainly reduces what is saved on the local device, such as browser history and private-session cookies. It does not automatically delete information that a website already saved on its own server.
 
 ## Cloudflare setup
 
-Create a Cloudflare KV namespace and bind it to your Pages project.
+### Build settings
 
-Binding name must be exactly:
+Use these Cloudflare Pages build settings:
 
-```txt
+- Framework preset: Vite
+- Build command: `npm run build`
+- Build output directory: `dist`
+- Root directory: leave empty
+
+### KV binding
+
+Create a Cloudflare KV namespace and bind it to the Pages project.
+
+Binding variable name must be exactly:
+
+```text
 PRIVACY_DEMO_KV
 ```
 
-Build settings:
+Add the binding for both Production and Preview environments if Cloudflare shows both.
 
-```txt
-Framework preset: Vite
-Build command: npm run build
-Build output directory: dist
+## Local development
+
+```bash
+npm install
+npm run dev
 ```
 
-## Project structure
+Cloudflare KV will only work correctly in the Cloudflare Pages runtime unless you configure local Cloudflare development tooling.
 
-```txt
-functions/api/save-demo.js    Saves the demo identity
-functions/api/whoami.js       Checks whether the server recognizes the visit
-functions/api/delete-demo.js  Deletes the demo identity
-src/main.jsx                  React app
-src/styles.css                UI styles
-```
+## Privacy notes
 
-## Recruiter-friendly explanation
-
-I intentionally avoided invasive fingerprinting and raw IP storage. The project uses a consent-based, short-lived network hash to explain the difference between local browser privacy and server-side persistence.
+This project is for education only. It does not store raw IP addresses, passwords, emails, or browsing history. It stores only the user's chosen display name, browser type, device type, timestamp, and a temporary server-side record that expires after 24 hours.
