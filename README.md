@@ -1,56 +1,118 @@
-# Incognito Buster: Beginner-Friendly Privacy Demo
+# Incognito Buster
 
-A Cloudflare Pages project that explains, in plain language, why private/incognito browsing does not make a visitor invisible to websites.
+A beginner-friendly cybersecurity awareness project that explains one important browser privacy idea:
 
-## What this version does
+> Private browsing protects data stored inside your browser, but it does not automatically erase data already saved by a website on its server.
 
-- No personalized demo link
-- User saves a name in a normal tab
-- User opens the same site URL in a private/incognito tab
-- The site checks whether the server has a temporary demo record
-- Uses a temporary hashed network key
-- Does not store raw IP addresses
-- Does not use invasive browser fingerprinting
-- Demo records expire after 24 hours
-- Includes beginner-friendly step-by-step instructions
-- Quiz section removed
+This project is designed as a portfolio-ready educational demo for recruiters and non-technical users.
 
-## What this project teaches
+## Live demo flow
 
-Private browsing mainly reduces what is saved on the local device, such as browser history and private-session cookies. It does not automatically delete information that a website already saved on its own server.
+1. Open the site in a normal browser tab.
+2. Read the consent notice and save a display name.
+3. Open a private/incognito window.
+4. Visit the same site URL, without using any personalized link.
+5. The site checks Cloudflare KV for a short-lived server-side demo record and explains where the name came from.
+
+## What this project does
+
+- Shows the difference between browser-side storage and server-side storage.
+- Uses Cloudflare Pages Functions as the backend.
+- Stores demo records in Cloudflare KV for 24 hours.
+- Uses a temporary hashed recognition key.
+- Avoids personalized demo links.
+- Avoids raw IP storage.
+- Avoids invasive browser fingerprinting.
+- Allows users to delete their demo record.
+- Provides beginner-friendly instructions directly in the UI.
+
+## What this project does not do
+
+- It does not hack private browsing.
+- It does not read browser history.
+- It does not access passwords.
+- It does not track users across other websites.
+- It does not store raw IP addresses.
+
+## Tech stack
+
+- React
+- Vite
+- Cloudflare Pages
+- Cloudflare Pages Functions
+- Cloudflare KV
+- Vitest
+- Vanilla CSS
+
+## Project structure
+
+```text
+src/
+  App.jsx
+  main.jsx
+  hooks/
+    useDemo.js
+  components/
+    DemoForm.jsx
+    Icons.jsx
+    InfoSections.jsx
+    ResultCard.jsx
+    SmallPieces.jsx
+functions/api/
+  _constants.js
+  _utils.js
+  save-demo.js
+  whoami.js
+  delete-demo.js
+public/
+  _headers
+tests/
+  utils.test.js
+```
 
 ## Cloudflare setup
 
-### Build settings
+Create a KV namespace and bind it to the Pages project.
 
-Use these Cloudflare Pages build settings:
-
-- Framework preset: Vite
-- Build command: `npm run build`
-- Build output directory: `dist`
-- Root directory: leave empty
-
-### KV binding
-
-Create a Cloudflare KV namespace and bind it to the Pages project.
-
-Binding variable name must be exactly:
+Required binding name:
 
 ```text
 PRIVACY_DEMO_KV
 ```
 
-Add the binding for both Production and Preview environments if Cloudflare shows both.
+Recommended Pages build settings:
 
-## Local development
+```text
+Framework preset: Vite
+Build command: npm run build
+Build output directory: dist
+Root directory: leave empty
+```
+
+Add the KV binding for both Production and Preview environments if you test preview deployments.
+
+## Security notes
+
+The demo uses several privacy and safety controls:
+
+- User consent is required before saving a demo record.
+- Names are trimmed and capped to 60 characters on the server.
+- Demo records expire after 24 hours using Cloudflare KV TTL.
+- Records can be deleted by the user.
+- Security headers are configured in `public/_headers`.
+- A small save cooldown is enforced to reduce repeated KV write spam.
+
+For a public deployment, also consider Cloudflare dashboard rate limiting for `/api/save-demo`, for example 5 requests per minute per IP.
+
+## Local commands
 
 ```bash
 npm install
 npm run dev
+npm run build
+npm test
 ```
 
-Cloudflare KV will only work correctly in the Cloudflare Pages runtime unless you configure local Cloudflare development tooling.
+## Resume-friendly summary
 
-## Privacy notes
-
-This project is for education only. It does not store raw IP addresses, passwords, emails, or browsing history. It stores only the user's chosen display name, browser type, device type, timestamp, and a temporary server-side record that expires after 24 hours.
+Built an educational privacy demo using React, Cloudflare Pages Functions, and KV to explain server-side persistence across private browsing sessions with consent-gated, short-lived, hashed demo records.

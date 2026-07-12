@@ -1,3 +1,5 @@
+import { KV_BINDING_NAME, VISITOR_KEY_SALT } from './_constants.js';
+
 export function json(data, status = 200) {
   return Response.json(data, {
     status,
@@ -23,19 +25,48 @@ export function detectDevice(userAgent) {
   return 'Desktop or laptop';
 }
 
-export async function createVisitorKey(request) {
-  const ip = request.headers.get('CF-Connecting-IP') || request.headers.get('X-Forwarded-For') || 'unknown-ip';
-  const today = new Date().toISOString().slice(0, 10);
-  const input = `${ip}:${today}:incognito-buster-safe-demo-v3`;
+function getTrustedIp(request) {
+  // Cloudflare Pages injects CF-Connecting-IP. The X-Forwarded-For fallback is only for local/dev-like environments.
+  return request.headers.get('CF-Connecting-IP') || request.headers.get('X-Forwarded-For') || 'unknown-ip';
+}
+
+export async function sha256Hex(input) {
   const data = new TextEncoder().encode(input);
   const hashBuffer = await crypto.subtle.digest('SHA-256', data);
-  const hashArray = Array.from(new Uint8Array(hashBuffer));
-  return hashArray.map((byte) => byte.toString(16).padStart(2, '0')).join('');
+  let hex = '';
+  for (const byte of new Uint8Array(hashBuffer)) {
+    hex += byte.toString(16).padStart(2, '0');
+  }
+  return hex;
+}
+
+export async function createVisitorKey(request) {
+  const ip = getTrustedIp(request);
+  const today = new Date().toISOString().slice(0, 10);
+  return sha256Hex(`${ip}:${today}:${VISITOR_KEY_SALT}`);
 }
 
 export function requireKv(env) {
-  if (!env.PRIVACY_DEMO_KV) {
-    return 'Missing KV binding: PRIVACY_DEMO_KV';
+  if (!env[KV_BINDING_NAME]) {
+    return `Missing KV binding: ${KV_BINDING_NAME}`;
   }
   return null;
+}
+
+export function safeParseRecord(value) {
+  if (!value) return null;
+  try {
+    const record = JSON.parse(value);
+    if (!record || typeof record !== 'object') return null;
+    if (typeof record.name !== 'string') return null;
+    return record;
+  } catch {
+    return null;
+  }
+}
+
+export function secondsSince(isoDate) {
+  const time = Date.parse(isoDate || '');
+  if (Number.isNaN(time)) return Number.POSITIVE_INFINITY;
+  return Math.floor((Date.now() - time) / 1000);
 }
