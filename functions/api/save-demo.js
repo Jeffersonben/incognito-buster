@@ -14,6 +14,10 @@ function detectDevice(userAgent) {
   return 'Desktop or laptop';
 }
 
+function shortAgent(userAgent) {
+  return String(userAgent || '').slice(0, 140);
+}
+
 export async function onRequestPost(context) {
   try {
     const { request, env } = context;
@@ -23,22 +27,44 @@ export async function onRequestPost(context) {
 
     const body = await request.json();
     const name = String(body.name || '').trim().slice(0, 60);
+    const consent = Boolean(body.consent);
+
+    if (!consent) {
+      return Response.json({ ok: false, error: 'Consent is required for this educational demo.' }, { status: 400 });
+    }
     if (!name) {
       return Response.json({ ok: false, error: 'Name is required.' }, { status: 400 });
     }
 
     const userAgent = request.headers.get('user-agent') || '';
     const id = crypto.randomUUID();
+    const now = new Date().toISOString();
     const record = {
+      id,
       name,
-      createdAt: new Date().toISOString(),
+      createdAt: now,
+      lastOpenedAt: null,
+      openCount: 0,
+      expiresIn: '24 hours',
       browser: detectBrowser(userAgent),
       device: detectDevice(userAgent),
-      note: 'This record was saved on the server to demonstrate server-side memory.'
+      userAgentPreview: shortAgent(userAgent),
+      storageSource: 'Cloudflare KV server-side storage',
+      consentMode: 'Explicit opt-in demo identity',
+      collectedData: ['chosen display name', 'browser type', 'device type', 'timestamp', 'temporary demo ID'],
+      notCollected: ['passwords', 'raw IP address', 'precise location', 'browsing history', 'cross-site tracking data'],
+      visitLog: [
+        {
+          event: 'Created demo identity',
+          at: now,
+          browser: detectBrowser(userAgent),
+          device: detectDevice(userAgent)
+        }
+      ]
     };
 
     await env.PRIVACY_DEMO_KV.put(`demo:${id}`, JSON.stringify(record), { expirationTtl: 60 * 60 * 24 });
-    return Response.json({ ok: true, id });
+    return Response.json({ ok: true, id, expiresIn: record.expiresIn });
   } catch (error) {
     return Response.json({ ok: false, error: 'Could not save demo record.' }, { status: 500 });
   }

@@ -1,85 +1,88 @@
 # Incognito Myth Buster
 
-A small Cloudflare Pages project that demonstrates a common privacy misconception:
+A consent-first Cloudflare Pages project that explains what private browsing protects and what it does not protect.
 
-> Private browsing protects local browser traces. It does not make you invisible to websites or erase information stored on a server.
+## What the project demonstrates
+
+This app shows that private/incognito browsing is mainly local-device privacy. It can help avoid saving browsing history, temporary cookies, and form data in the normal browser profile, but it does not erase data that a website already saved on its own server.
+
+The demo uses a safe method:
+
+1. The user gives consent.
+2. The user enters a chosen display name.
+3. A Cloudflare Pages Function stores the record in Cloudflare KV.
+4. The app creates a random demo ID link.
+5. The user opens that link in a private window.
+6. The server returns the saved name and visit details.
+
+## Safe design choices
+
+This project intentionally avoids invasive recognition methods.
+
+It does not collect:
+
+- Passwords
+- Raw IP addresses
+- Precise location
+- Browsing history
+- Cross-site tracking data
+- Browser fingerprints
+
+Demo records expire after 24 hours.
 
 ## Features
 
-- Normal-tab name saving demo
-- Private/incognito test link
-- Cloudflare Pages Functions API
+- Consent-first demo flow
 - Cloudflare KV server-side storage
-- Browser storage inspector
+- Private-tab test link
+- Logged visit details
+- Storage inspector for cookies, local storage, session storage, and server storage
+- Explanation section: how websites can sometimes recognize returning visitors
 - Privacy meter
-- Interactive quiz
-- LinkedIn-ready educational UI
+- Quiz section
+- Delete demo record button
+- LinkedIn-friendly project explanation
 
-## How the demo works
+## Tech stack
 
-1. User types a name in the normal tab.
-2. `/api/save-demo` stores that name in Cloudflare KV.
-3. The app creates a demo link with a random ID.
-4. User opens the link in a private/incognito window.
-5. `/api/get-demo` loads the name from the server.
-6. The page explains that the data came from the server, not normal-tab browser storage.
+- React
+- Vite
+- Cloudflare Pages
+- Cloudflare Pages Functions
+- Cloudflare KV
+- lucide-react icons
 
-## Deploy to Cloudflare Pages
+## Cloudflare setup
 
-### 1. Upload to GitHub
+Create a KV namespace in Cloudflare, then add a KV binding to your Pages project.
 
-Create a GitHub repository and push this folder.
+Binding variable name must be exactly:
 
-### 2. Create a Cloudflare Pages project
+```text
+PRIVACY_DEMO_KV
+```
 
-- Go to Cloudflare Dashboard
-- Workers & Pages
-- Create application
-- Pages
-- Connect your GitHub repository
+Add the binding to both Production and Preview environments.
 
-### 3. Build settings
+## Build settings
 
-Use:
+Cloudflare Pages settings:
 
-```txt
+```text
 Framework preset: Vite
 Build command: npm run build
 Build output directory: dist
 ```
 
-### 4. Add KV storage
-
-Create a KV namespace in Cloudflare:
-
-```txt
-Name: privacy-demo-kv
-```
-
-Then bind it to your Pages project:
-
-```txt
-Variable name: PRIVACY_DEMO_KV
-KV namespace: privacy-demo-kv
-```
-
-Add the binding for both Production and Preview if you want preview deployments to work too.
-
-### 5. Deploy
-
-Cloudflare will build and deploy the site.
-
-## Local development note
-
-The frontend can run locally with:
+## Local development
 
 ```bash
 npm install
 npm run dev
 ```
 
-The API needs Cloudflare Pages Functions and KV. For full local API testing, use Wrangler with a KV binding.
+For full Cloudflare Function + KV testing, use Cloudflare's Pages development tooling or deploy to Cloudflare Pages.
 
-## Ethical note
+## Recruiter-friendly explanation
 
-This project deliberately avoids hidden fingerprinting. It uses a visible demo ID link so users understand exactly how the server remembers the name.
+I built this project to explain the difference between browser-side privacy and server-side persistence. I intentionally avoided browser fingerprinting and raw IP storage, using a consent-based demo token instead. This demonstrates both technical understanding and privacy-aware engineering.
