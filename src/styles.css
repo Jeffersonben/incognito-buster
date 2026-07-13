@@ -711,7 +711,8 @@ footer {
   }
 
   .hero {
-    padding: 28px 20px 30px;
+    padding-top: 48px;
+    padding-bottom: 36px;
   }
 
   h1 {
