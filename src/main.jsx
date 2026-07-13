@@ -178,8 +178,7 @@ function App() {
             not <span className="accent-word">invisible</span> to websites.
           </h1>
           <p className="hero-sub">
-            This simple project shows why a website may still remember something
-            after you move from a normal browser tab to a private/incognito tab.
+            Incognito hides your browsing from this device — not from the website.
           </p>
           <div className="heroActions">
             <a href="#demo" className="primary">
@@ -194,17 +193,10 @@ function App() {
         {/* ── Read This First ─────────────────────────────────── */}
         <div className="section-label"><Info size={13} /> Context</div>
         <section className="plainBox">
-          <h2><Info size={20} /> Read this first</h2>
+          <h2><Info size={20} /> How it works</h2>
           <p>
-            <strong>This site does not hack private browsing.</strong> It only saves the name
-            you type on the server for 24 hours. Then, when you open the same site again
-            in a private tab, the server checks whether it already has a temporary record
-            for your network today.
-          </p>
-          <p>
-            Think of it like a hotel receptionist. Wearing sunglasses does not erase the hotel
-            register. Private mode is the sunglasses. The server database is the register.
-            Dramatic, but accurate enough for humanity.
+            Your name is saved on the server for 24 hours. When you revisit in a private tab,
+            the server recognizes you — not via cookies or local storage, but a server-side record.
           </p>
         </section>
 
@@ -305,19 +297,14 @@ function App() {
         <section className="grid two">
           <div className="card">
             <h2><Database size={20} /> Storage inspector</h2>
-            <p>This explains where the saved name comes from.</p>
-            <StorageRow name="Cookies"                    status="Not used"                          ok={false} />
-            <StorageRow name="Local Storage"              status="Not used"                          ok={false} />
-            <StorageRow name="Session Storage"            status="Not used"                          ok={false} />
-            <StorageRow name="Cloudflare KV server storage" status={found ? 'Record found' : 'No record'} ok={found} />
+            <StorageRow name="Cookies"           status="Not used"                          ok={false} />
+            <StorageRow name="Local Storage"     status="Not used"                          ok={false} />
+            <StorageRow name="Session Storage"   status="Not used"                          ok={false} />
+            <StorageRow name="KV server storage" status={found ? 'Record found' : 'No record'} ok={found} />
           </div>
           <div className="card">
-            <h2><Server size={20} /> How this project recognizes the data</h2>
-            <p>
-              The server creates a temporary hashed key from request information visible
-              to the server. It does not store your raw IP address and does not use
-              invasive browser fingerprinting.
-            </p>
+            <h2><Server size={20} /> How recognition works</h2>
+            <p>A temporary hashed key is built from your request. No raw IP stored. No fingerprinting.</p>
             <div className="flow">
               <span>Normal tab</span>
               <b>→</b>
@@ -333,31 +320,22 @@ function App() {
         {/* ── Privacy Notes ────────────────────────────────────── */}
         <div className="section-label"><Lock size={13} /> Privacy</div>
         <section className="plainBox">
-          <h2><Lock size={20} /> Privacy and safety notes</h2>
+          <h2><Lock size={20} /> Privacy notes</h2>
           <ul className="plainList">
-            <li>The demo stores only your chosen display name, browser type, device type, save time, and a temporary server recognition record.</li>
-            <li>The raw IP address is not saved in the database.</li>
-            <li>The demo record expires automatically after 24 hours.</li>
-            <li>You can delete your demo record using the delete button.</li>
-            <li>This may fail if you change network, use VPN, switch device, or your IP changes.</li>
+            <li>Only your display name, browser type, and save time are stored.</li>
+            <li>No raw IP address is saved.</li>
+            <li>Record expires in 24 hours — delete it anytime with the delete button.</li>
           </ul>
         </section>
 
         {/* ── Explainer ────────────────────────────────────────── */}
         <div className="section-label"><Globe size={13} /> Explainer</div>
         <section className="plainBox">
-          <h2><Globe size={20} /> Beginner explanation</h2>
+          <h2><Globe size={20} /> The key lesson</h2>
           <p>
-            <strong>Browser side</strong> means data saved inside your browser, like cookies
-            or browsing history. Private mode is good at reducing this.
-          </p>
-          <p>
-            <strong>Server side</strong> means data saved by the website on its own
-            computer/database. Private mode on your device does not automatically delete that.
-          </p>
-          <p>
-            That is the whole lesson. Not magic, not hacking, just client vs server.
-            The web remains annoyingly logical.
+            <strong>Browser side</strong> (cookies, history) — private mode clears this.{' '}
+            <strong>Server side</strong> (website's database) — private mode has no effect.
+            That's the whole lesson.
           </p>
         </section>
 
