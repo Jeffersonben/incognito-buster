@@ -627,13 +627,60 @@ input:not([type])::placeholder {
 
 /* ── Footer ───────────────────────────────────────────────── */
 footer {
-  text-align: center;
   color: var(--ink-muted);
-  padding: 32px 20px 48px;
+  padding: 28px 20px 44px;
   font-size: 13px;
   font-weight: 500;
   border-top: 1.5px solid var(--border-bold);
   margin-top: 40px;
+}
+
+.footer-inner {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 14px;
+  max-width: 1120px;
+  margin: 0 auto;
+}
+
+.footer-copy {
+  margin: 0;
+  color: var(--ink-muted);
+}
+
+.footer-links {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.footer-links a {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  padding: 7px 14px;
+  border: 1.5px solid var(--border-bold);
+  border-radius: var(--radius);
+  background: white;
+  color: var(--ink);
+  font-size: 12px;
+  font-weight: 800;
+  text-decoration: none;
+  box-shadow: var(--shadow-sm);
+  transition: all 0.15s ease;
+  letter-spacing: 0.01em;
+}
+
+.footer-links a:hover {
+  transform: translate(-1px, -1px);
+  box-shadow: var(--shadow-md);
+}
+
+.footer-links a:active {
+  transform: translate(1px, 1px);
+  box-shadow: none;
 }
 
 /* ── Section Divider Label ────────────────────────────────── */

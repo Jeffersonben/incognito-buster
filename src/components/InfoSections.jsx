@@ -44,7 +44,7 @@ export function StorageInspector({ found }) {
       <StorageRow name="Cloudflare KV server storage" status={found ? 'Record found' : 'No record'} ok={found}/>
     </div>
     <div className="card">
-      <h2><Server/> How this project recognizes the demo</h2>
+      <h2><Server/> How this project recognizes the data</h2>
       <p>The server creates a temporary hashed key from request information visible to the server. It does not store your raw IP address and does not use invasive browser fingerprinting.</p>
       <div className="flow"><span>Normal tab</span><b>→</b><span>Server save</span><b>→</b><span>Private tab</span><b>→</b><span>Server check</span></div>
     </div>
