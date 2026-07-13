@@ -14,7 +14,7 @@ export function App() {
       <h1>Private tab is private on your device, not invisible to websites.</h1>
       <p className="sub">This simple project shows why a website may still remember something after you move from a normal browser tab to a private/incognito tab.</p>
       <div className="heroActions">
-        <a href="#demo" className="primary"><MousePointerClick size={18}/> Start the demo</a>
+        <a href="#demo" className="primary"><MousePointerClick size={18}/> Start</a>
         <button className="secondary" onClick={demo.copyUrl}><Copy size={18}/> Copy site URL</button>
       </div>
     </section>

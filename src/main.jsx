@@ -127,7 +127,7 @@ function App() {
       <nav className="topnav">
         <div className="topnav-brand">
           <ShieldCheck size={20} />
-          INCOGNITO MYTH BUSTER
+          INCOGNITO BUSTER
         </div>
         <div className="topnav-badge">
           <Globe size={13} />
@@ -153,7 +153,7 @@ function App() {
           </p>
           <div className="heroActions">
             <a href="#demo" className="primary">
-              <MousePointerClick size={16} /> Start the demo
+              <MousePointerClick size={16} /> Start
             </a>
             <button className="secondary" onClick={copyUrl}>
               <Copy size={16} /> Copy site URL
@@ -218,12 +218,12 @@ function App() {
           </div>
 
           <form onSubmit={saveName} className="form">
-            <label htmlFor="demo-name">Your demo display name</label>
+            <label htmlFor="demo-name">Your display name</label>
             <input
               id="demo-name"
               value={name}
               onChange={(e) => setName(e.target.value)}
-              placeholder="Example: Paul"
+              placeholder="Example: Jeffy"
               maxLength="60"
             />
             <label className="consent">
@@ -236,7 +236,7 @@ function App() {
               temporarily for 24 hours.
             </label>
             <button className="primary button" disabled={loading}>
-              {loading ? 'Working...' : 'Save demo identity'}
+              {loading ? 'Working...' : 'Save Identity'}
             </button>
           </form>
 

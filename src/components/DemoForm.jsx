@@ -10,10 +10,10 @@ export function DemoForm({ name, setName, consent, setConsent, loading, message,
       <Step number="3" title="Visit the same website URL">Do not use a special link. Just open this same site address again.</Step>
     </div>
     <form onSubmit={saveName} className="form">
-      <label>Your demo display name</label>
-      <input value={name} onChange={(event) => setName(event.target.value)} placeholder="Example: Paul" maxLength="60" />
+      <label>Your display name</label>
+      <input value={name} onChange={(event) => setName(event.target.value)} placeholder="Example: Jeffy" maxLength="60" />
       <label className="consent"><input type="checkbox" checked={consent} onChange={(event) => setConsent(event.target.checked)} /> I understand this is an educational demo and my chosen name will be stored temporarily for 24 hours.</label>
-      <button className="primary button" disabled={loading}>{loading ? 'Working...' : 'Save demo identity'}</button>
+      <button className="primary button" disabled={loading}>{loading ? 'Working...' : 'Save Identity'}</button>
     </form>
     <div className="status">{message}</div>
   </section>;
