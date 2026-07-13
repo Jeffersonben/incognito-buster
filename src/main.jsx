@@ -49,6 +49,7 @@ function App() {
   const [found, setFound] = useState(false);
   const [message, setMessage] = useState('Checking whether this browser has a saved demo record...');
   const [loading, setLoading] = useState(false);
+  const [showPopup, setShowPopup] = useState(false);
 
   async function checkRecord() {
     setLoading(true);
@@ -61,6 +62,7 @@ function App() {
         setFound(true);
         setRecord(data.record);
         setMessage('A saved demo record was found on the server.');
+        setShowPopup(true);
       } else {
         setFound(false);
         setRecord(null);
@@ -122,6 +124,35 @@ function App() {
 
   return (
     <div className="site-frame">
+
+      {/* ── Welcome Back Popup ───────────────────────────────── */}
+      {showPopup && found && record && (
+        <div className="popup-overlay" onClick={() => setShowPopup(false)}>
+          <div className="popup-card" onClick={e => e.stopPropagation()}>
+            <div className="popup-icon">👁️</div>
+            <div className="badge success" style={{ marginBottom: '16px' }}>
+              <Eye size={13} /> Server record found
+            </div>
+            <h2>Welcome back, {record.name}!</h2>
+            <p>
+              The server recognized you — even from a private tab. Your name was
+              saved on the server, not in your browser.
+            </p>
+            <div className="popup-meta">
+              <span><strong>Saved at:</strong> {new Date(record.savedAt).toLocaleString()}</span>
+              <span><strong>Method:</strong> {record.method}</span>
+            </div>
+            <div className="popup-actions">
+              <button className="primary button" onClick={() => setShowPopup(false)}>
+                <ArrowRight size={16} /> Got it
+              </button>
+              <button className="danger" onClick={() => { deleteRecord(); setShowPopup(false); }}>
+                <Trash2 size={16} /> Delete my record
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
 
       {/* ── Top Nav ─────────────────────────────────────────── */}
       <nav className="topnav">

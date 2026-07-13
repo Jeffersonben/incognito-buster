@@ -685,3 +685,94 @@ footer {
     padding-top: 32px;
   }
 }
+
+/* ── Hero Start Button — extra horizontal padding ─────────── */
+.heroActions a.primary,
+.heroActions button.primary {
+  padding-left: 32px;
+  padding-right: 32px;
+}
+
+/* ── Welcome Back Popup ───────────────────────────────────── */
+.popup-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(10, 10, 10, 0.5);
+  z-index: 200;
+  display: grid;
+  place-items: center;
+  padding: 20px;
+  animation: popupFadeIn 0.2s ease;
+  backdrop-filter: blur(2px);
+}
+
+@keyframes popupFadeIn {
+  from { opacity: 0; }
+  to   { opacity: 1; }
+}
+
+.popup-card {
+  background: var(--bg-card);
+  border: 2px solid var(--border-bold);
+  border-radius: var(--radius-lg);
+  padding: 36px 32px 28px;
+  max-width: 480px;
+  width: 100%;
+  box-shadow: 8px 8px 0 var(--border-bold);
+  animation: popupSlideUp 0.25s ease;
+  position: relative;
+}
+
+@keyframes popupSlideUp {
+  from { transform: translateY(24px); opacity: 0; }
+  to   { transform: translateY(0);    opacity: 1; }
+}
+
+.popup-icon {
+  width: 56px;
+  height: 56px;
+  background: var(--accent);
+  border: 2px solid var(--border-bold);
+  border-radius: 50%;
+  display: grid;
+  place-items: center;
+  font-size: 24px;
+  box-shadow: var(--shadow-sm);
+  margin-bottom: 20px;
+}
+
+.popup-card h2 {
+  font-size: 1.75rem;
+  margin-bottom: 10px;
+}
+
+.popup-card p {
+  margin-bottom: 20px;
+  font-size: 0.95rem;
+}
+
+.popup-meta {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  padding: 14px 16px;
+  background: white;
+  border: 1.5px solid var(--border-bold);
+  border-radius: var(--radius);
+  box-shadow: var(--shadow-sm);
+  margin-bottom: 24px;
+  font-size: 13px;
+  color: var(--ink-muted);
+}
+
+.popup-meta strong {
+  color: var(--ink);
+  font-weight: 700;
+}
+
+.popup-actions {
+  display: flex;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+
