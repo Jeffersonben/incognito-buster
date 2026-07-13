@@ -293,7 +293,7 @@ button:disabled {
 h2 {
   font-family: 'Instrument Serif', Georgia, serif;
   font-weight: 400;
-  font-size: 1.55rem;
+  font-size: clamp(1.15rem, 3vw, 1.55rem);
   line-height: 1.1;
   letter-spacing: -0.02em;
   margin: 0 0 16px;
@@ -304,7 +304,7 @@ h2 {
 }
 
 h3 {
-  font-size: 0.95rem;
+  font-size: clamp(0.82rem, 2vw, 0.95rem);
   font-weight: 800;
   margin: 0 0 5px;
   letter-spacing: -0.01em;
@@ -313,6 +313,7 @@ h3 {
 p {
   color: var(--ink-subtle);
   line-height: 1.7;
+  font-size: clamp(0.85rem, 2.2vw, 1rem);
   margin: 0 0 12px;
 }
 
@@ -864,12 +865,15 @@ footer {
 }
 
 .fnode-icon {
-  font-size: 28px;
-  line-height: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 44px;
+  height: 44px;
 }
 
 .fnode-label {
-  font-size: 12px;
+  font-size: clamp(10px, 1.8vw, 13px);
   font-weight: 800;
   text-align: center;
   color: var(--ink);
@@ -967,7 +971,7 @@ footer {
   background: white;
   border: 1.5px solid var(--border-bold);
   border-radius: 999px;
-  font-size: 12px;
+  font-size: clamp(11px, 1.6vw, 13px);
   font-weight: 700;
   color: var(--ink);
   box-shadow: var(--shadow-sm);
@@ -979,7 +983,7 @@ footer {
 }
 
 .diag-label {
-  font-size: 11px;
+  font-size: clamp(10px, 1.5vw, 11px);
   font-weight: 800;
   text-transform: uppercase;
   letter-spacing: 0.07em;
@@ -1014,9 +1018,9 @@ footer {
 .sto-idle { background: white; }
 .sto-yes  { background: var(--accent); box-shadow: var(--shadow-md); opacity: 1 !important; }
 
-.sto-icon   { font-size: 22px; }
-.sto-name   { font-size: 11px; font-weight: 800; color: var(--ink); }
-.sto-status { font-size: 11px; font-weight: 700; color: var(--ink-muted); }
+.sto-icon   { display: flex; align-items: center; justify-content: center; height: 28px; }
+.sto-name   { font-size: clamp(10px, 1.6vw, 12px); font-weight: 800; color: var(--ink); }
+.sto-status { font-size: clamp(10px, 1.4vw, 11px); font-weight: 700; color: var(--ink-muted); }
 .sto-yes .sto-status { color: var(--ink); font-weight: 900; }
 
 /* ── Privacy Chips ────────────────────────────────────────── */
@@ -1041,7 +1045,7 @@ footer {
   background: white;
   border: 1.5px solid var(--border-bold);
   border-radius: 999px;
-  font-size: 13px;
+  font-size: clamp(12px, 1.8vw, 14px);
   font-weight: 700;
   color: var(--ink);
   box-shadow: var(--shadow-sm);
@@ -1072,12 +1076,14 @@ footer {
 .lesson-server  { background: #fff8f0; }
 
 .lesson-icon {
-  font-size: 32px;
-  line-height: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 40px;
 }
 
 .lesson-side h3 {
-  font-size: 1rem;
+  font-size: clamp(0.88rem, 2vw, 1rem);
   font-weight: 900;
   margin: 0;
   color: var(--ink);
@@ -1085,7 +1091,7 @@ footer {
 }
 
 .lesson-side p {
-  font-size: 12px;
+  font-size: clamp(11px, 1.6vw, 13px);
   color: var(--ink-muted);
   margin: 0;
   font-weight: 600;
@@ -1111,7 +1117,7 @@ footer {
   margin-top: 4px;
   padding: 5px 12px;
   border-radius: 999px;
-  font-size: 11px;
+  font-size: clamp(10px, 1.4vw, 12px);
   font-weight: 800;
   border: 1.5px solid var(--border-bold);
   letter-spacing: 0.01em;

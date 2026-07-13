@@ -1,9 +1,10 @@
 import React, { useEffect, useState } from 'react';
 import { createRoot } from 'react-dom/client';
 import {
-  ShieldCheck, Eye, Database, Lock, Trash2, RefreshCcw,
+  ShieldCheck, Eye, EyeOff, Database, Lock, Trash2,
   AlertTriangle, Server, Globe, CheckCircle2, MousePointerClick,
-  Copy, Info, ArrowRight
+  Copy, Info, ArrowRight, Pencil, Upload, HardDrive,
+  Cloud, Ban, Clock, Monitor, Key, Wifi, History, ClipboardList
 } from 'lucide-react';
 import './styles.css';
 
@@ -194,22 +195,22 @@ function App() {
         <section className="flow-section">
           <div className="flow-diagram">
             <div className="fnode">
-              <div className="fnode-icon">✏️</div>
+              <div className="fnode-icon"><Pencil size={26} strokeWidth={1.8} color="var(--ink)" /></div>
               <div className="fnode-label">Type a name</div>
             </div>
-            <div className="farrow">→</div>
+            <div className="farrow"><ArrowRight size={18} color="var(--purple)" strokeWidth={2.5} /></div>
             <div className="fnode">
-              <div className="fnode-icon">💾</div>
+              <div className="fnode-icon"><Upload size={26} strokeWidth={1.8} color="var(--purple)" /></div>
               <div className="fnode-label">Server saves it</div>
             </div>
-            <div className="farrow">→</div>
+            <div className="farrow"><ArrowRight size={18} color="var(--purple)" strokeWidth={2.5} /></div>
             <div className="fnode fnode-incognito">
-              <div className="fnode-icon">🕵️</div>
+              <div className="fnode-icon"><EyeOff size={26} strokeWidth={1.8} color="var(--purple)" /></div>
               <div className="fnode-label">Open incognito</div>
             </div>
-            <div className="farrow">→</div>
+            <div className="farrow"><ArrowRight size={18} color="var(--purple)" strokeWidth={2.5} /></div>
             <div className="fnode fnode-found">
-              <div className="fnode-icon">👁️</div>
+              <div className="fnode-icon"><Eye size={26} strokeWidth={1.8} color="var(--ink)" /></div>
               <div className="fnode-label">Still recognized!</div>
             </div>
           </div>
@@ -223,10 +224,10 @@ function App() {
               <span>Incognito clears</span>
             </div>
             <div className="scope-chips">
-              <span className="schip">🗂 Browser history</span>
-              <span className="schip">🍪 Cookies</span>
-              <span className="schip">💾 Local storage</span>
-              <span className="schip">📝 Form data</span>
+              <span className="schip"><History size={12} strokeWidth={2} color="#15803d" /> Browser history</span>
+              <span className="schip"><Database size={12} strokeWidth={2} color="#15803d" /> Cookies</span>
+              <span className="schip"><HardDrive size={12} strokeWidth={2} color="#15803d" /> Local storage</span>
+              <span className="schip"><ClipboardList size={12} strokeWidth={2} color="#15803d" /> Form data</span>
             </div>
           </div>
           <div className="scope-divider">vs</div>
@@ -236,10 +237,10 @@ function App() {
               <span>Incognito can't touch</span>
             </div>
             <div className="scope-chips">
-              <span className="schip">🖥 Server data</span>
-              <span className="schip">🌐 Your IP</span>
-              <span className="schip">🔑 Login sessions</span>
-              <span className="schip">📡 Your requests</span>
+              <span className="schip"><Server size={12} strokeWidth={2} color="#b45309" /> Server data</span>
+              <span className="schip"><Globe size={12} strokeWidth={2} color="#b45309" /> Your IP</span>
+              <span className="schip"><Key size={12} strokeWidth={2} color="#b45309" /> Login sessions</span>
+              <span className="schip"><Wifi size={12} strokeWidth={2} color="#b45309" /> Your requests</span>
             </div>
           </div>
         </section>
@@ -318,24 +319,24 @@ function App() {
           <p className="diag-label">Where is the data stored?</p>
           <div className="storage-chips">
             <div className="sto-chip sto-no">
-              <span className="sto-icon">🍪</span>
+              <span className="sto-icon"><Database size={20} strokeWidth={1.8} color="var(--ink-muted)" /></span>
               <span className="sto-name">Cookies</span>
-              <span className="sto-status">✗ Not used</span>
+              <span className="sto-status">Not used</span>
             </div>
             <div className="sto-chip sto-no">
-              <span className="sto-icon">💾</span>
+              <span className="sto-icon"><HardDrive size={20} strokeWidth={1.8} color="var(--ink-muted)" /></span>
               <span className="sto-name">Local Storage</span>
-              <span className="sto-status">✗ Not used</span>
+              <span className="sto-status">Not used</span>
             </div>
             <div className="sto-chip sto-no">
-              <span className="sto-icon">📋</span>
+              <span className="sto-icon"><ClipboardList size={20} strokeWidth={1.8} color="var(--ink-muted)" /></span>
               <span className="sto-name">Session Storage</span>
-              <span className="sto-status">✗ Not used</span>
+              <span className="sto-status">Not used</span>
             </div>
             <div className={`sto-chip ${found ? 'sto-yes' : 'sto-idle'}`}>
-              <span className="sto-icon">☁️</span>
+              <span className="sto-icon"><Cloud size={20} strokeWidth={1.8} color={found ? 'var(--ink)' : 'var(--ink-muted)'} /></span>
               <span className="sto-name">KV Server</span>
-              <span className="sto-status">{found ? '✓ Record found' : '— No record'}</span>
+              <span className="sto-status">{found ? 'Record found' : 'No record'}</span>
             </div>
           </div>
         </section>
@@ -343,21 +344,21 @@ function App() {
         {/* ── Privacy chips + Key lesson diagram ───────────────── */}
         <section className="bottom-sections">
           <div className="privacy-chips">
-            <div className="pchip"><span>🔒</span> Display name only</div>
-            <div className="pchip"><span>🚫</span> No IP saved</div>
-            <div className="pchip"><span>⏱</span> Expires in 24h</div>
+            <div className="pchip"><Lock size={13} strokeWidth={2} color="var(--purple)" /> Display name only</div>
+            <div className="pchip"><Ban size={13} strokeWidth={2} color="var(--purple)" /> No IP saved</div>
+            <div className="pchip"><Clock size={13} strokeWidth={2} color="var(--purple)" /> Expires in 24h</div>
           </div>
 
           <div className="lesson-split">
             <div className="lesson-side lesson-browser">
-              <div className="lesson-icon">💻</div>
+              <div className="lesson-icon"><Monitor size={30} strokeWidth={1.6} color="#1d4ed8" /></div>
               <h3>Browser</h3>
               <p>History · Cookies · Local storage</p>
               <div className="lesson-tag tag-safe">✓ Incognito clears this</div>
             </div>
             <div className="lesson-vs">vs</div>
             <div className="lesson-side lesson-server">
-              <div className="lesson-icon">🖥️</div>
+              <div className="lesson-icon"><Server size={30} strokeWidth={1.6} color="#b45309" /></div>
               <h3>Server</h3>
               <p>Database · KV store</p>
               <div className="lesson-tag tag-warn">✗ Incognito can't touch</div>
