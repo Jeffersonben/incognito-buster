@@ -70,27 +70,6 @@ tests/
   utils.test.js
 ```
 
-## Cloudflare setup
-
-Create a KV namespace and bind it to the Pages project.
-
-Required binding name:
-
-```text
-PRIVACY_DEMO_KV
-```
-
-Recommended Pages build settings:
-
-```text
-Framework preset: Vite
-Build command: npm run build
-Build output directory: dist
-Root directory: leave empty
-```
-
-Add the KV binding for both Production and Preview environments if you test preview deployments.
-
 ## Security notes
 
 The demo uses several privacy and safety controls:
@@ -113,6 +92,6 @@ npm run build
 npm test
 ```
 
-## Resume-friendly summary
+## Note
 
 Built an educational privacy demo using React, Cloudflare Pages Functions, and KV to explain server-side persistence across private browsing sessions with consent-gated, short-lived, hashed demo records.
