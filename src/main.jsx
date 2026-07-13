@@ -190,36 +190,57 @@ function App() {
           </div>
         </section>
 
-        {/* ── Read This First ─────────────────────────────────── */}
-        <div className="section-label"><Info size={13} /> Context</div>
-        <section className="plainBox">
-          <h2><Info size={20} /> How it works</h2>
-          <p>
-            Your name is saved on the server for 24 hours. When you revisit in a private tab,
-            the server recognizes you — not via cookies or local storage, but a server-side record.
-          </p>
+        {/* ── How it works — flowchart ─────────────────────────── */}
+        <section className="flow-section">
+          <div className="flow-diagram">
+            <div className="fnode">
+              <div className="fnode-icon">✏️</div>
+              <div className="fnode-label">Type a name</div>
+            </div>
+            <div className="farrow">→</div>
+            <div className="fnode">
+              <div className="fnode-icon">💾</div>
+              <div className="fnode-label">Server saves it</div>
+            </div>
+            <div className="farrow">→</div>
+            <div className="fnode fnode-incognito">
+              <div className="fnode-icon">🕵️</div>
+              <div className="fnode-label">Open incognito</div>
+            </div>
+            <div className="farrow">→</div>
+            <div className="fnode fnode-found">
+              <div className="fnode-icon">👁️</div>
+              <div className="fnode-label">Still recognized!</div>
+            </div>
+          </div>
         </section>
 
-        {/* ── What Private Browsing Does/Doesn't Cover ──────────── */}
-        <div className="section-label"><Eye size={13} /> The reality</div>
-        <section className="grid two">
-          <div className="card">
-            <h2>What private browsing usually protects</h2>
-            <ul className="checkList">
-              <li><CheckCircle2 size={16} /> Browser history on this device</li>
-              <li><CheckCircle2 size={16} /> Cookies after the private window closes</li>
-              <li><CheckCircle2 size={16} /> Local storage after the private session ends</li>
-              <li><CheckCircle2 size={16} /> Form data saved by your browser</li>
-            </ul>
+        {/* ── Incognito scope diagram ───────────────────────────── */}
+        <section className="scope-diagram">
+          <div className="scope-col scope-safe">
+            <div className="scope-header">
+              <span className="scope-dot dot-safe"/>
+              <span>Incognito clears</span>
+            </div>
+            <div className="scope-chips">
+              <span className="schip">🗂 Browser history</span>
+              <span className="schip">🍪 Cookies</span>
+              <span className="schip">💾 Local storage</span>
+              <span className="schip">📝 Form data</span>
+            </div>
           </div>
-          <div className="card warn">
-            <h2>What private browsing does not fully hide</h2>
-            <ul className="checkList">
-              <li><AlertTriangle size={16} /> Websites can still receive your request</li>
-              <li><AlertTriangle size={16} /> Server-side data can still exist</li>
-              <li><AlertTriangle size={16} /> Your network/IP may still be visible to the site</li>
-              <li><AlertTriangle size={16} /> Login accounts still identify you</li>
-            </ul>
+          <div className="scope-divider">vs</div>
+          <div className="scope-col scope-warn">
+            <div className="scope-header">
+              <span className="scope-dot dot-warn"/>
+              <span>Incognito can't touch</span>
+            </div>
+            <div className="scope-chips">
+              <span className="schip">🖥 Server data</span>
+              <span className="schip">🌐 Your IP</span>
+              <span className="schip">🔑 Login sessions</span>
+              <span className="schip">📡 Your requests</span>
+            </div>
           </div>
         </section>
 
@@ -292,51 +313,56 @@ function App() {
           </section>
         )}
 
-        {/* ── Storage Inspector + Recognition ─────────────────── */}
-        <div className="section-label"><Database size={13} /> Under the hood</div>
-        <section className="grid two">
-          <div className="card">
-            <h2><Database size={20} /> Storage inspector</h2>
-            <StorageRow name="Cookies"           status="Not used"                          ok={false} />
-            <StorageRow name="Local Storage"     status="Not used"                          ok={false} />
-            <StorageRow name="Session Storage"   status="Not used"                          ok={false} />
-            <StorageRow name="KV server storage" status={found ? 'Record found' : 'No record'} ok={found} />
-          </div>
-          <div className="card">
-            <h2><Server size={20} /> How recognition works</h2>
-            <p>A temporary hashed key is built from your request. No raw IP stored. No fingerprinting.</p>
-            <div className="flow">
-              <span>Normal tab</span>
-              <b>→</b>
-              <span>Server save</span>
-              <b>→</b>
-              <span>Private tab</span>
-              <b>→</b>
-              <span>Server check</span>
+        {/* ── Storage diagram ───────────────────────────────────── */}
+        <section className="storage-diagram">
+          <p className="diag-label">Where is the data stored?</p>
+          <div className="storage-chips">
+            <div className="sto-chip sto-no">
+              <span className="sto-icon">🍪</span>
+              <span className="sto-name">Cookies</span>
+              <span className="sto-status">✗ Not used</span>
+            </div>
+            <div className="sto-chip sto-no">
+              <span className="sto-icon">💾</span>
+              <span className="sto-name">Local Storage</span>
+              <span className="sto-status">✗ Not used</span>
+            </div>
+            <div className="sto-chip sto-no">
+              <span className="sto-icon">📋</span>
+              <span className="sto-name">Session Storage</span>
+              <span className="sto-status">✗ Not used</span>
+            </div>
+            <div className={`sto-chip ${found ? 'sto-yes' : 'sto-idle'}`}>
+              <span className="sto-icon">☁️</span>
+              <span className="sto-name">KV Server</span>
+              <span className="sto-status">{found ? '✓ Record found' : '— No record'}</span>
             </div>
           </div>
         </section>
 
-        {/* ── Privacy Notes ────────────────────────────────────── */}
-        <div className="section-label"><Lock size={13} /> Privacy</div>
-        <section className="plainBox">
-          <h2><Lock size={20} /> Privacy notes</h2>
-          <ul className="plainList">
-            <li>Only your display name, browser type, and save time are stored.</li>
-            <li>No raw IP address is saved.</li>
-            <li>Record expires in 24 hours — delete it anytime with the delete button.</li>
-          </ul>
-        </section>
+        {/* ── Privacy chips + Key lesson diagram ───────────────── */}
+        <section className="bottom-sections">
+          <div className="privacy-chips">
+            <div className="pchip"><span>🔒</span> Display name only</div>
+            <div className="pchip"><span>🚫</span> No IP saved</div>
+            <div className="pchip"><span>⏱</span> Expires in 24h</div>
+          </div>
 
-        {/* ── Explainer ────────────────────────────────────────── */}
-        <div className="section-label"><Globe size={13} /> Explainer</div>
-        <section className="plainBox">
-          <h2><Globe size={20} /> The key lesson</h2>
-          <p>
-            <strong>Browser side</strong> (cookies, history) — private mode clears this.{' '}
-            <strong>Server side</strong> (website's database) — private mode has no effect.
-            That's the whole lesson.
-          </p>
+          <div className="lesson-split">
+            <div className="lesson-side lesson-browser">
+              <div className="lesson-icon">💻</div>
+              <h3>Browser</h3>
+              <p>History · Cookies · Local storage</p>
+              <div className="lesson-tag tag-safe">✓ Incognito clears this</div>
+            </div>
+            <div className="lesson-vs">vs</div>
+            <div className="lesson-side lesson-server">
+              <div className="lesson-icon">🖥️</div>
+              <h3>Server</h3>
+              <p>Database · KV store</p>
+              <div className="lesson-tag tag-warn">✗ Incognito can't touch</div>
+            </div>
+          </div>
         </section>
 
       </main>

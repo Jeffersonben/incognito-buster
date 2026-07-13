@@ -822,3 +822,333 @@ footer {
   flex-wrap: wrap;
 }
 
+/* ══════════════════════════════════════════════════════════════
+   DIAGRAM COMPONENTS
+   ══════════════════════════════════════════════════════════════ */
+
+/* ── How-it-works Flowchart ───────────────────────────────── */
+.flow-section {
+  margin: 20px 0;
+  padding: 28px 24px;
+  background: var(--bg-alt);
+  border: 1.5px solid var(--border-bold);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-sm);
+}
+
+.flow-diagram {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.fnode {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+  background: white;
+  border: 1.5px solid var(--border-bold);
+  border-radius: var(--radius-lg);
+  padding: 16px 20px;
+  min-width: 110px;
+  box-shadow: var(--shadow-sm);
+  transition: all 0.15s ease;
+}
+
+.fnode:hover {
+  transform: translate(-1px, -1px);
+  box-shadow: var(--shadow-md);
+}
+
+.fnode-icon {
+  font-size: 28px;
+  line-height: 1;
+}
+
+.fnode-label {
+  font-size: 12px;
+  font-weight: 800;
+  text-align: center;
+  color: var(--ink);
+  letter-spacing: -0.01em;
+}
+
+.fnode-incognito {
+  background: #f3f0ff;
+  border-color: var(--purple);
+}
+
+.fnode-found {
+  background: var(--accent);
+  border-color: var(--border-bold);
+  box-shadow: var(--shadow-md);
+}
+
+.farrow {
+  font-size: 20px;
+  font-weight: 900;
+  color: var(--purple);
+  flex-shrink: 0;
+}
+
+/* ── Incognito Scope Diagram ──────────────────────────────── */
+.scope-diagram {
+  display: flex;
+  align-items: stretch;
+  gap: 0;
+  margin: 16px 0;
+  border: 1.5px solid var(--border-bold);
+  border-radius: var(--radius-lg);
+  overflow: hidden;
+  box-shadow: var(--shadow-sm);
+}
+
+.scope-col {
+  flex: 1;
+  padding: 20px 20px 24px;
+}
+
+.scope-safe { background: #f0fff4; }
+.scope-warn { background: #fffbf0; }
+
+.scope-header {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 12px;
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  margin-bottom: 14px;
+  color: var(--ink);
+}
+
+.scope-dot {
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  flex-shrink: 0;
+  border: 1.5px solid var(--border-bold);
+}
+
+.dot-safe { background: #22c55e; }
+.dot-warn { background: #f59e0b; }
+
+.scope-divider {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 44px;
+  flex-shrink: 0;
+  font-size: 11px;
+  font-weight: 900;
+  color: var(--ink-muted);
+  background: white;
+  border-left: 1.5px solid var(--border-bold);
+  border-right: 1.5px solid var(--border-bold);
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+}
+
+.scope-chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+
+.schip {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  padding: 5px 10px;
+  background: white;
+  border: 1.5px solid var(--border-bold);
+  border-radius: 999px;
+  font-size: 12px;
+  font-weight: 700;
+  color: var(--ink);
+  box-shadow: var(--shadow-sm);
+}
+
+/* ── Storage Chips Diagram ────────────────────────────────── */
+.storage-diagram {
+  margin: 16px 0;
+}
+
+.diag-label {
+  font-size: 11px;
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: 0.07em;
+  color: var(--ink-muted);
+  margin: 0 0 12px;
+}
+
+.storage-chips {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 10px;
+}
+
+.sto-chip {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 6px;
+  padding: 18px 12px;
+  border: 1.5px solid var(--border-bold);
+  border-radius: var(--radius-lg);
+  text-align: center;
+  transition: all 0.15s ease;
+}
+
+.sto-chip:hover {
+  transform: translate(-1px, -1px);
+  box-shadow: var(--shadow-md);
+}
+
+.sto-no  { background: white;         opacity: 0.7; }
+.sto-idle { background: white; }
+.sto-yes  { background: var(--accent); box-shadow: var(--shadow-md); opacity: 1 !important; }
+
+.sto-icon   { font-size: 22px; }
+.sto-name   { font-size: 11px; font-weight: 800; color: var(--ink); }
+.sto-status { font-size: 11px; font-weight: 700; color: var(--ink-muted); }
+.sto-yes .sto-status { color: var(--ink); font-weight: 900; }
+
+/* ── Privacy Chips ────────────────────────────────────────── */
+.bottom-sections {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  margin: 16px 0;
+}
+
+.privacy-chips {
+  display: flex;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+
+.pchip {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  padding: 8px 16px;
+  background: white;
+  border: 1.5px solid var(--border-bold);
+  border-radius: 999px;
+  font-size: 13px;
+  font-weight: 700;
+  color: var(--ink);
+  box-shadow: var(--shadow-sm);
+}
+
+/* ── Lesson Split ─────────────────────────────────────────── */
+.lesson-split {
+  display: flex;
+  align-items: stretch;
+  gap: 0;
+  border: 1.5px solid var(--border-bold);
+  border-radius: var(--radius-lg);
+  overflow: hidden;
+  box-shadow: var(--shadow-sm);
+}
+
+.lesson-side {
+  flex: 1;
+  padding: 24px 20px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  gap: 8px;
+}
+
+.lesson-browser { background: #f0f9ff; }
+.lesson-server  { background: #fff8f0; }
+
+.lesson-icon {
+  font-size: 32px;
+  line-height: 1;
+}
+
+.lesson-side h3 {
+  font-size: 1rem;
+  font-weight: 900;
+  margin: 0;
+  color: var(--ink);
+  letter-spacing: -0.01em;
+}
+
+.lesson-side p {
+  font-size: 12px;
+  color: var(--ink-muted);
+  margin: 0;
+  font-weight: 600;
+}
+
+.lesson-vs {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 44px;
+  flex-shrink: 0;
+  font-size: 11px;
+  font-weight: 900;
+  color: var(--ink-muted);
+  background: white;
+  border-left: 1.5px solid var(--border-bold);
+  border-right: 1.5px solid var(--border-bold);
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+
+.lesson-tag {
+  margin-top: 4px;
+  padding: 5px 12px;
+  border-radius: 999px;
+  font-size: 11px;
+  font-weight: 800;
+  border: 1.5px solid var(--border-bold);
+  letter-spacing: 0.01em;
+}
+
+.tag-safe { background: var(--accent); color: var(--ink); }
+.tag-warn { background: #fed7aa;       color: #92400e; }
+
+/* ── Diagram responsive ───────────────────────────────────── */
+@media (max-width: 820px) {
+  .flow-diagram { gap: 6px; }
+
+  .fnode {
+    min-width: 80px;
+    padding: 12px 10px;
+  }
+
+  .fnode-icon  { font-size: 22px; }
+  .fnode-label { font-size: 10px; }
+  .farrow      { font-size: 16px; }
+
+  .scope-diagram,
+  .lesson-split {
+    flex-direction: column;
+  }
+
+  .scope-divider,
+  .lesson-vs {
+    width: 100%;
+    height: 36px;
+    border-left: none;
+    border-right: none;
+    border-top: 1.5px solid var(--border-bold);
+    border-bottom: 1.5px solid var(--border-bold);
+  }
+
+  .storage-chips {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
