@@ -746,10 +746,17 @@ footer {
   inset: 0;
   background: rgba(10, 10, 10, 0.5);
   z-index: 200;
-  display: grid;
-  place-items: center;
-  padding: 20px;
+  /* flex + align-start lets the card scroll on iOS — grid/place-items traps scroll */
+  display: flex;
+  align-items: flex-start;
+  justify-content: center;
+  padding: 16px 16px calc(16px + env(safe-area-inset-bottom));
+  overflow-y: auto;
+  -webkit-overflow-scrolling: touch;
+  overscroll-behavior: contain;
   animation: popupFadeIn 0.2s ease;
+  /* Safari needs the -webkit- prefix */
+  -webkit-backdrop-filter: blur(2px);
   backdrop-filter: blur(2px);
 }
 
@@ -1520,9 +1527,16 @@ footer {
 /* ── Accordion modal ─────────────────────────────────────── */
 .explain-modal {
   max-width: 540px;
-  max-height: 90vh;
+  width: 100%;
+  /* dvh = dynamic viewport height — correct on iOS Safari (excludes browser chrome) */
+  max-height: calc(100dvh - 32px);
   overflow-y: auto;
+  -webkit-overflow-scrolling: touch;
+  overscroll-behavior: contain;
   padding: 32px 28px 28px;
+  /* push card down so it starts near top of overlay for natural scroll */
+  margin: auto 0;
+  align-self: flex-start;
 }
 
 .explain-header {
@@ -1651,28 +1665,190 @@ footer {
   justify-content: flex-start;
 }
 
-/* ── Responsive tweaks for wizard screens ────────────────── */
-@media (max-width: 580px) {
+/* ══════════════════════════════════════════════════════════════
+   COMPREHENSIVE MOBILE RESPONSIVE — all wizard screens
+   ══════════════════════════════════════════════════════════════ */
+
+/* Body scroll lock — applied via JS when modal open */
+body.modal-open {
+  overflow: hidden;
+  /* iOS Safari: prevent body scroll behind modal */
+  position: fixed;
+  width: 100%;
+}
+
+/* Ensure all interactive elements meet 44×44px touch target */
+button, a, input[type="checkbox"] + label {
+  -webkit-tap-highlight-color: transparent;
+}
+
+/* ── Tablet (≤768px) ─────────────────────────────────────── */
+@media (max-width: 768px) {
+  .wizard-screen {
+    padding: 24px 16px 40px;
+    align-items: flex-start;
+    padding-top: 32px;
+  }
+
   .wizard-content {
-    padding: 28px 20px 24px;
+    padding: 28px 22px 24px;
   }
 
-  .surprise-line-1 {
-    font-size: clamp(1.8rem, 8vw, 2.8rem);
+  .progress-dots {
+    margin-bottom: 24px;
   }
 
-  .surprise-line-2 {
-    font-size: clamp(1.2rem, 6vw, 1.8rem);
+  .surprise-wrap {
+    padding: 32px 20px 48px;
+    align-items: flex-start;
+    justify-content: flex-start;
+    padding-top: 48px;
+  }
+
+  .popup-overlay {
+    padding: 12px 12px calc(12px + env(safe-area-inset-bottom));
   }
 
   .explain-modal {
-    padding: 24px 18px 20px;
+    padding: 24px 20px 24px;
   }
 
   .browser-illo-wrap {
-    max-width: 320px;
-    margin-left: auto;
-    margin-right: auto;
+    max-width: 360px;
+    margin: 0 auto;
+  }
+}
+
+/* ── Mobile (≤580px) ─────────────────────────────────────── */
+@media (max-width: 580px) {
+  /* Wizard card */
+  .wizard-content {
+    padding: 24px 18px 20px;
+    border-radius: var(--radius);
+  }
+
+  /* Ensure all buttons are at least 44px tall (touch target) */
+  .btn-primary, .btn-secondary, .btn-danger,
+  a.primary, button.primary,
+  a.secondary, button.secondary,
+  button.danger {
+    min-height: 44px;
+  }
+
+  /* Name input on mobile */
+  input[type="text"],
+  input:not([type]) {
+    font-size: 16px; /* prevents iOS zoom on focus */
+  }
+
+  /* Surprise screen text */
+  .surprise-line-1 {
+    font-size: clamp(1.7rem, 9vw, 2.6rem);
+    margin-bottom: 12px;
+  }
+
+  .surprise-line-2 {
+    font-size: clamp(1.15rem, 6vw, 1.7rem);
+    margin-bottom: 16px;
+  }
+
+  .surprise-line-3 {
+    font-size: 0.92rem;
+    margin-bottom: 16px;
+  }
+
+  .surprise-emoji {
+    font-size: clamp(2.5rem, 12vw, 4rem);
+    margin-bottom: 20px;
+  }
+
+  .surprise-server-badge {
+    font-size: 11px;
+    margin-bottom: 24px;
+  }
+
+  .surprise-reveal-btn {
+    padding: 13px 24px;
+    font-size: 14px;
+  }
+
+  /* Explanation modal */
+  .explain-modal {
+    padding: 20px 16px 20px;
+    border-radius: var(--radius);
+    /* Full-width on small screens */
+    max-width: 100%;
+  }
+
+  .popup-card {
+    border-radius: var(--radius);
+    /* Reduce heavy shadow on mobile */
+    box-shadow: 4px 4px 0 var(--border-bold);
+  }
+
+  .accordion-trigger {
+    font-size: 13px;
+    padding: 13px 14px;
+    min-height: 44px;
+  }
+
+  .accordion-body {
+    padding: 12px 14px 14px;
+  }
+
+  .explain-close {
+    width: 36px;
+    height: 36px;
+    font-size: 14px;
+    /* Easier to tap */
+    min-height: 44px;
+    min-width: 44px;
+  }
+
+  /* Browser illustration in step 2 */
+  .browser-illo-wrap {
+    max-width: 100%;
+  }
+
+  /* HeroActions buttons side-by-side → stack on very small */
+  .heroActions {
+    gap: 10px;
+  }
+
+  /* Nav */
+  .topnav {
+    padding: 0 14px;
+  }
+
+  .topnav-badge {
+    display: none; /* saves space on small nav */
+  }
+
+  /* Footer */
+  footer {
+    padding: 20px 16px calc(32px + env(safe-area-inset-bottom));
+  }
+}
+
+/* ── Small mobile (≤390px) ────────────────────────────────── */
+@media (max-width: 390px) {
+  h1 {
+    font-size: clamp(2.2rem, 11vw, 3rem);
+  }
+
+  .heroActions {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .heroActions button,
+  .heroActions a {
+    width: 100%;
+    justify-content: center;
+  }
+
+  .wizard-content {
+    padding: 20px 16px 18px;
   }
 }
 

@@ -69,6 +69,21 @@ function ExplainModal({ onClose, onDelete, record }) {
     return () => window.removeEventListener('keydown', handler);
   }, [onClose]);
 
+  // Body scroll-lock — fixes iOS Safari body scroll behind overlay
+  useEffect(() => {
+    const scrollY = window.scrollY;
+    document.body.classList.add('modal-open');
+    // iOS Safari: store scroll position before fixed positioning resets it
+    document.body.style.top = `-${scrollY}px`;
+    return () => {
+      document.body.classList.remove('modal-open');
+      document.body.style.top = '';
+      // Restore scroll position
+      window.scrollTo(0, scrollY);
+    };
+  }, []);
+
+
   return (
     <div className="popup-overlay" onClick={onClose}>
       <div
